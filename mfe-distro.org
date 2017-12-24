@@ -1,0 +1,188 @@
+* Install dependencies
+
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc-bin python-minimal dvdbackup mkisofs
+mkdir -p ~/dev
+cd ~/dev
+git clone https://github.com/mferland/distroconf.git mfedistro
+
+* Configure Terminal
+
+echo "export TERMINAL=\"gnome-terminal --hide-menubar\"" >> .bashrc
+
+* Configure i3
+
+mkdir ~/.config/i3/config
+cp ~/dev/mfedistro/i3.conf ~/.config/i3/config
+
+* Install fonts
+
+cd ~
+mkdir .fonts && cd .fonts
+wget https://cdn.proggyfonts.net/wp-content/downloads/ProggyClean.ttf.zip
+unzip ProggyClean.ttf.zip
+rm Licence.txt Readme.txt ProggyClean.ttf.zip
+
+* Install Emacs Packages
+
+mkdir -p ~/.emacs.d/site-lisp
+mkdir -p ~/.saves
+
+** Dash (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/dash
+git clone https://github.com/magnars/dash.el.git ~/.emacs.d/site-lisp/dash
+cd ~/.emacs.d/site-lisp/dash
+git checkout -b mfe 2.13.0
+
+** with-editor (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/with-editor
+git clone https://github.com/magit/with-editor.git ~/.emacs.d/site-lisp/with-editor
+cd ~/.emacs.d/site-lisp/with-editor
+git checkout -b mfe v2.7.0
+
+** magit
+
+mkdir -p ~/.emacs.d/site-lisp/magit
+git clone https://github.com/magit/magit.git ~/.emacs.d/site-lisp/magit
+cd ~/.emacs.d/site-lisp/magit
+git checkout -b mfe 2.11.0
+echo "LOAD_PATH = -L ${HOME}/.emacs.d/site-lisp/magit/lisp" > config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/dash" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/with-editor" >> config.mk
+make
+
+More info:
+https://github.com/magit/magit/blob/master/Documentation/magit.org
+
+** emacs-async (req. by helm)
+
+mkdir -p ~/.emacs.d/site-lisp/emacs-async
+git clone https://github.com/jwiegley/emacs-async.git ~/.emacs.d/site-lisp/emacs-async
+cd ~/.emacs.d/site-lisp/emacs-async
+git checkout -b mfe v1.9.2
+make
+
+** popup-el (req. by helm)
+
+mkdir -p ~/.emacs.d/site-lisp/popup-el
+git clone https://github.com/auto-complete/popup-el.git ~/.emacs.d/site-lisp/popup-el
+cd ~/.emacs.d/site-lisp/popup-el
+git checkout -b mfe v0.5.3
+
+** helm
+
+mkdir -p ~/.emacs.d/site-lisp/helm
+git clone https://github.com/emacs-helm/helm.git ~/.emacs.d/site-lisp/helm
+cd ~/.emacs.d/site-lisp/helm
+git checkout -b mfe v2.8.5
+EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
+
+** nyan-mode
+
+mkdir -p ~/.emacs.d/site-lisp/nyan-mode
+git clone https://github.com/TeMPOraL/nyan-mode.git ~/.emacs.d/site-lisp/nyan-mode
+cd ~/.emacs.d/site-lisp/nyan-mode
+
+** expand-region
+
+mkdir -p ~/.emacs.d/site-lisp/expand-region
+git clone https://github.com/magnars/expand-region.el.git ~/.emacs.d/site-lisp/expand-region
+cd ~/.emacs.d/site-lisp/expand-region
+git checkout -b mfe 0.11.0
+
+** bb-mode
+
+mkdir -p ~/.emacs.d/site-lisp/bb-mode
+git clone https://github.com/mferland/bb-mode.git ~/.emacs.d/site-lisp/bb-mode
+
+** dts-mode
+
+mkdir -p ~/.emacs.d/site-lisp/dts-mode
+git clone https://github.com/bgamari/dts-mode.git ~/.emacs.d/site-lisp/dts-mode
+
+* Install Emacs Server
+
+mkdir ~/.config/systemd/user
+cp ~/dev/mfedistro/emacs.service ~/.config/systemd/user
+systemctl --user enable emacs
+
+mkdir -p ~/bin
+cp ~/dev/mfedistro/edit ~/bin/edit
+chmod 755 ~/bin/edit
+echo "export EDITOR=~/bin/edit" >> ~/.bashrc
+
+* Configure NFS mounts
+
+mkdir -p ~/nas/doc
+mkdir -p ~/nas/download
+mkdir -p ~/nas/music
+mkdir -p ~/nas/picture
+mkdir -p ~/nas/video
+
+export TMPFILE=$(mktemp)
+echo "" >> $TMPFILE
+echo "# local network mounts" >> $TMPFILE
+for m in doc download music picture video; do echo "freenas.doom.priv:/mnt/mfe/${m} /home/marc/nas/${m} nfs rsize=8192,wsize=8192,timeo=14,intr 0 0" >> $TMPFILE; done;
+sudo -E /bin/sh -c "cat $TMPFILE >> /etc/fstab"
+
+* Xmodmap
+
+echo "clear Mod4" > ~/.Xmodmap
+echo "add Mod4 = Muhenkan" >> ~/.Xmodmap
+
+* IBus
+
+ibus-setup
+# set shortcut to <Ctrl> <Shift> <Super> space
+# Show property panel: Hide automatically
+# Add French Canadian keyboard
+# uncheck "Use system keyboard layout"
+# Note: make sure keyboard dip switch are: 001010
+
+* VirtualBox
+
+sudo echo "deb http://download.virtualbox.org/virtualbox/debian artful contrib" >> /etc/apt/sources.list
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install virtualbox-5.2
+sudo apt-get install dkms
+
+* Vagrant
+
+wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
+sudo dpkg -i vagrant_2.0.1_x86_64.deb
+rm vagrant_2.0.1_x86_64.deb
+
+* Install ssh key pair
+* Spotify
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0DF731E45CE24F27EEEB1450EFDC8610341D9410
+echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+sudo apt-get update
+sudo apt-get install spotify-client
+
+* Docker
+
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+# test
+sudo docker run hello-world
+
+* i3status
+
+cp ~/dev/mfedistro/i3status.conf ~/.config/i3status/config
+
+* libdvdcss
+
+sudo apt-get install libdvd-pkg
+sudo dpkg-reconfigure libdvd-pkg
+
+* Terminal
+
+Monospace Regular 12
