@@ -1,6 +1,6 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs git-lfs openssh-server
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -11,7 +11,7 @@ echo "export TERMINAL=\"gnome-terminal --hide-menubar\"" >> .bashrc
 
 * Configure i3
 
-mkdir -p ~/.config/i3/config
+mkdir -p ~/.config/i3
 cp ~/dev/mfedistro/i3.conf ~/.config/i3/config
 
 * Install fonts
@@ -26,6 +26,7 @@ rm Licence.txt Readme.txt ProggyClean.ttf.zip
 
 mkdir -p ~/.emacs.d/site-lisp
 mkdir -p ~/.saves
+cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 
 ** Dash (req. by magit)
 
@@ -136,7 +137,7 @@ echo "add Mod4 = Muhenkan" >> ~/.Xmodmap
 ibus-setup
 # set shortcut to <Ctrl> <Shift> <Super> space
 # Show property panel: Hide automatically
-# Add French Canadian keyboard
+# Add French Canadian keyboard and US English
 # uncheck "Use system keyboard layout"
 # Note: make sure keyboard dip switch are: 001010
 
@@ -193,3 +194,9 @@ Monospace Regular 12
 
 git config --global user.name "Marc Ferland"
 git config --global user.email marc.ferland@gmail.com
+* work
+
+mkdir ~/mnt
+sudo mount /dev/sdb1 ./mnt
+sudo chmod 755 ./mnt
+echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
