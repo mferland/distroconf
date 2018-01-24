@@ -1,6 +1,10 @@
 * Install dependencies
 
+<<<<<<< HEAD
 sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs git-lfs openssh-server
+=======
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server
+>>>>>>> Add more stuff
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -194,9 +198,42 @@ Monospace Regular 12
 
 git config --global user.name "Marc Ferland"
 git config --global user.email marc.ferland@gmail.com
-* work
+
+* dput
+
+touch ~/.dput.cf
+echo "[mentors]" >> ~/.dput.cf
+echo "fqdn = mentors.debian.net" >> ~/.dput.cf
+echo "incoming = /upload" >> ~/.dput.cf
+echo "method = http" >> ~/.dput.cf
+echo "allow_unsigned_uploads = 0" >> ~/.dput.cf
+echo "progress_indicator = 2" >> ~/.dput.cf
+echo "# Allow uploads for UNRELEASED packages" >> ~/.dput.cf
+echo "allowed_distributions = .*" >> ~/.dput.cf
+
+* gpg
+
+gpg --import ~/nas/??/mykey_pub.gpg
+gpg --allow-secret-key-import --import ~/mykey_sec.gpg
+gpg --list-keys
+
+* BACKUP
+
+** GPG
+
+gpg --list-keys
+gpg --output mykey_pub.gpg --armor --export KEY
+gpg --output mykey_sec.gpg --armor --export-secret-key KEY
+cp mykey_*.gpg ~/nas/??
+
+** SSH
+
+cp -a ~/.ssh ~/nas/??
+>>>>>>> Add more stuff
+* WORK
 
 mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
+
