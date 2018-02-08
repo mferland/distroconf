@@ -1,10 +1,13 @@
 * Install dependencies
 
-
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
+
+* Add to dialout group
+
+sudo gpasswd --add ${USER} dialout
 
 * Configure Terminal
 
