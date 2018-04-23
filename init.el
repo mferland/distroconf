@@ -19,16 +19,9 @@
 
 (setenv "SSH_AUTH_SOCK" (concat (getenv "HOME") "/.ssh-auth-sock"))
 
-;; nyan-cat
-(when (window-system)
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/nyan-mode")
-  (require 'nyan-mode)
-  (nyan-mode))
-
 ;; theme
 (load-theme 'tango-dark t)
 
-(add-to-list 'load-path "~/.emacs.d/site-lisp/nyan-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/bb-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-async")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
@@ -38,6 +31,7 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/popup-el")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/powerline")
 
 ;; expand-region
 (require 'expand-region)
@@ -68,7 +62,7 @@
 
 ;; C hook
 (defun my-c-mode-hook ()
-  (setq c-basic-offset 4)
+  (setq c-basic-offset 8)
   (setq-default indent-tabs-mode t)
   (c-set-offset 'substatement-open 0)
   (setq c-default-style "linux")
@@ -124,10 +118,12 @@
       helm-ff-file-name-history-use-recentf t)
 (helm-mode 1)
 
-
 ;; dts-mode
-(add-to-list 'load-path "~/.emacs.d/dts-mode")
 (require 'dts-mode)
+
+;; powerline
+(require 'powerline)
+(powerline-default-theme)
 
 ;; ;; emacs backup configuration
 (setq backup-directory-alist `(("." . "~/.saves")))

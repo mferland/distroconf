@@ -83,12 +83,6 @@ cd ~/.emacs.d/site-lisp/helm
 git checkout -b mfe v2.8.5
 EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
 
-** nyan-mode
-
-mkdir -p ~/.emacs.d/site-lisp/nyan-mode
-git clone https://github.com/TeMPOraL/nyan-mode.git ~/.emacs.d/site-lisp/nyan-mode
-cd ~/.emacs.d/site-lisp/nyan-mode
-
 ** expand-region
 
 mkdir -p ~/.emacs.d/site-lisp/expand-region
