@@ -22,6 +22,11 @@
 ;; theme
 (load-theme 'tango-dark t)
 
+;; global hl
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "gray12")
+(set-face-foreground 'highlight nil)
+
 (add-to-list 'load-path "~/.emacs.d/site-lisp/bb-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-async")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/expand-region")
