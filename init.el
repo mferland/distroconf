@@ -33,6 +33,8 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/helm")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dash")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/magit/lisp")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/magit-popup")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ghub")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/popup-el")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")

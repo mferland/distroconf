@@ -37,24 +37,42 @@ cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 mkdir -p ~/.emacs.d/site-lisp/dash
 git clone https://github.com/magnars/dash.el.git ~/.emacs.d/site-lisp/dash
 cd ~/.emacs.d/site-lisp/dash
-git checkout -b mfe 2.13.0
+git checkout -b mfe 2.14.1
 
 ** with-editor (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/with-editor
 git clone https://github.com/magit/with-editor.git ~/.emacs.d/site-lisp/with-editor
 cd ~/.emacs.d/site-lisp/with-editor
-git checkout -b mfe v2.7.0
+git checkout -b mfe v2.7.2
+
+** magit-popup (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/magit-popup
+git clone https://github.com/magit/magit-popup.git ~/.emacs.d/site-lisp/magit-popup
+cd ~/.emacs.d/site-lisp/magit-popup
+git checkout -b mfe v2.12.3
+make
+
+** ghub (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/ghub
+git clone https://github.com/magit/ghub.git ~/.emacs.d/site-lisp/ghub
+cd ~/.emacs.d/site-lisp/ghub
+git checkout -b mfe v2.0.0
+make
 
 ** magit
 
 mkdir -p ~/.emacs.d/site-lisp/magit
 git clone https://github.com/magit/magit.git ~/.emacs.d/site-lisp/magit
 cd ~/.emacs.d/site-lisp/magit
-git checkout -b mfe 2.11.0
+git checkout -b mfe 2.12.1
 echo "LOAD_PATH = -L ${HOME}/.emacs.d/site-lisp/magit/lisp" > config.mk
 echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/dash" >> config.mk
 echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/with-editor" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/magit-popup" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/ghub" >> config.mk
 make
 
 More info:
@@ -65,7 +83,7 @@ https://github.com/magit/magit/blob/master/Documentation/magit.org
 mkdir -p ~/.emacs.d/site-lisp/emacs-async
 git clone https://github.com/jwiegley/emacs-async.git ~/.emacs.d/site-lisp/emacs-async
 cd ~/.emacs.d/site-lisp/emacs-async
-git checkout -b mfe v1.9.2
+git checkout -b mfe v1.9.3
 make
 
 ** popup-el (req. by helm)
@@ -80,7 +98,7 @@ git checkout -b mfe v0.5.3
 mkdir -p ~/.emacs.d/site-lisp/helm
 git clone https://github.com/emacs-helm/helm.git ~/.emacs.d/site-lisp/helm
 cd ~/.emacs.d/site-lisp/helm
-git checkout -b mfe v2.8.5
+git checkout -b mfe v2.9.2
 EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
 
 ** expand-region
@@ -146,7 +164,7 @@ ibus-setup
 
 * VirtualBox
 
-echo "deb http://download.virtualbox.org/virtualbox/debian artful contrib" | sudo tee -a /etc/apt/sources.list
+echo "deb http://download.virtualbox.org/virtualbox/debian bionic contrib" | sudo tee -a /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install -y virtualbox-5.2
@@ -154,9 +172,9 @@ sudo apt-get install -y dkms
 
 * Vagrant
 
-wget https://releases.hashicorp.com/vagrant/2.0.1/vagrant_2.0.1_x86_64.deb
-sudo dpkg -i vagrant_2.0.1_x86_64.deb
-rm vagrant_2.0.1_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.1.0/vagrant_2.1.0_x86_64.deb
+sudo dpkg -i vagrant_2.1.0_x86_64.deb
+rm vagrant_2.1.0_x86_64.deb
 
 * Install ssh key pair
 * Spotify
