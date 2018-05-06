@@ -247,6 +247,11 @@ cp mykey_*.gpg ~/nas/??
 
 cp -a ~/.ssh ~/nas/??
 >>>>>>> Add more stuff
+
+** Firefox
+
+Export bookmarks.
+
 * WORK
 
 mkdir ~/mnt
