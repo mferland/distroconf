@@ -1,6 +1,6 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -122,6 +122,11 @@ git clone https://github.com/bgamari/dts-mode.git ~/.emacs.d/site-lisp/dts-mode
 
 mkdir -p ~/.emacs.d/site-lisp/powerline
 git clone https://github.com/milkypostman/powerline.git ~/.emacs.d/site-lisp/powerline
+
+** go-mode
+
+mkdir -p ~/.emacs.d/site-lisp/go-mode
+git clone https://github.com/dominikh/go-mode.el.git ~/.emacs.d/site-lisp/go-mode
 
 * Install Emacs Server
 
