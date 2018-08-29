@@ -1,6 +1,7 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero
+
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -174,6 +175,15 @@ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-
 sudo apt-get update
 sudo apt-get install -y virtualbox-5.2
 sudo apt-get install -y dkms
+
+** Install Extension Pack (for USB2-3 support)
+
+NOTE: Check the latest version first.
+
+wget https://download.virtualbox.org/virtualbox/5.2.12/Oracle_VM_VirtualBox_Extension_Pack-5.2.12.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.12.vbox-extpack
+sudo usermod -aG vboxusers marc
+reboot
 
 * Vagrant
 
