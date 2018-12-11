@@ -132,6 +132,13 @@
 (require 'powerline)
 (powerline-default-theme)
 
+;; use minted for latex listings
+(setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
 ;; ;; emacs backup configuration
 (setq backup-directory-alist `(("." . "~/.saves")))
 (setq backup-by-copying t)
