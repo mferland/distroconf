@@ -6,6 +6,12 @@ mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
 
+* OpenCL
+
+sudo apt install mesa-opencl-icd
+sudo apt install opencl-headers
+sudo apt install ocl-icd-opencl-dev
+
 * Add to dialout group
 
 sudo gpasswd --add ${USER} dialout
