@@ -236,6 +236,11 @@ Monospace Regular 12
 
 git config --global user.name "Marc Ferland"
 git config --global user.email marc.ferland@gmail.com
+git config --global sendemail.from "ferlandm@amotus.ca"
+git config --global sendemail.smtpuser "marc.ferland@gmail.com"
+git config --global sendemail.smtpserver "smtp.googlemail.com"
+git config --global sendemail.smtpencryption tls
+git config --global sendemail.smtpserverport 587
 
 * dput
 
