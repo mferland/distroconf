@@ -181,6 +181,11 @@ sudo apt-get update
 sudo apt-get install -y virtualbox-5.2
 sudo apt-get install -y dkms
 
+** Install symlink to ~/mnt
+
+cd
+ln -sf "/home/marc/mnt/VirtualBox VMs/" "VirtualBox VMs"
+
 ** Install Extension Pack (for USB2-3 support)
 
 NOTE: Check the latest version first.
