@@ -39,6 +39,7 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/powerline")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/ggtags")
 
 ;; expand-region
 (require 'expand-region)
@@ -64,6 +65,7 @@
   (c-set-offset 'substatement-open 0)
   (setq c-default-style "bsd")
   (setq show-trailing-whitespace t)
+  (ggtags-mode 1)
   (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\):" 1 font-lock-warning-face t))))
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
@@ -74,6 +76,7 @@
   (c-set-offset 'substatement-open 0)
   (setq c-default-style "linux")
   (setq show-trailing-whitespace t)
+  (ggtags-mode 1)
   (font-lock-add-keywords nil '(("\\<\\(FIXME\\|TODO\\|BUG\\):" 1 font-lock-warning-face t)))
   (setq flycheck-gcc-language-standard "gnu99"))
 (add-hook 'c-mode-hook 'my-c-mode-hook)
