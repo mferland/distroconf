@@ -1,6 +1,6 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email afl xvnc4viewer global
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email afl xvnc4viewer python3-pip bison flex libssl-dev global
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -192,22 +192,24 @@ sudo apt-get install -y dkms
 ** Install symlink to ~/mnt
 
 cd
-ln -sf "/home/marc/mnt/VirtualBox VMs/" "VirtualBox VMs"
+mkdir VirtualBox\ VMs
+ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 ** Install Extension Pack (for USB2-3 support)
 
 NOTE: Check the latest version first.
 
-wget https://download.virtualbox.org/virtualbox/5.2.12/Oracle_VM_VirtualBox_Extension_Pack-5.2.12.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.12.vbox-extpack
+wget https://download.virtualbox.org/virtualbox/5.2.22/Oracle_VM_VirtualBox_Extension_Pack-5.2.22.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.22.vbox-extpack
 sudo usermod -aG vboxusers marc
+rm Oracle_VM_VirtualBox_Extension_Pack-5.2.22.vbox-extpack
 reboot
 
 * Vagrant
 
-wget https://releases.hashicorp.com/vagrant/2.1.0/vagrant_2.1.0_x86_64.deb
-sudo dpkg -i vagrant_2.1.0_x86_64.deb
-rm vagrant_2.1.0_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
+sudo dpkg -i vagrant_2.2.2_x86_64.deb
+rm vagrant_2.2.2_x86_64.deb
 
 * Skype
 
@@ -222,7 +224,7 @@ sudo dpkg -i pins-tool-for-imx-processors-v5-1_amd64.deb
 * Install ssh key pair
 * Spotify
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0DF731E45CE24F27EEEB1450EFDC8610341D9410
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
 echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
 sudo apt-get update
 sudo apt-get install -y spotify-client
@@ -306,4 +308,3 @@ mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
-
