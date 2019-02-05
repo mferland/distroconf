@@ -150,6 +150,9 @@ cp ~/dev/mfedistro/edit ~/bin/edit
 chmod 755 ~/bin/edit
 echo "export EDITOR=~/bin/edit" >> ~/.bashrc
 
+cp ~/dev/mfedistro/lock ~/bin/lock
+chmod 755 ~/bin/lock
+
 * Configure NFS mounts
 
 mkdir -p ~/nas/doc
