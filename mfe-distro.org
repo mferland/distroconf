@@ -216,9 +216,9 @@ the VistualBox window.
 
 * Vagrant
 
-wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
-sudo dpkg -i vagrant_2.2.2_x86_64.deb
-rm vagrant_2.2.2_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
+sudo dpkg -i vagrant_2.2.4_x86_64.deb
+rm vagrant_2.2.4_x86_64.deb
 
 * Skype
 
