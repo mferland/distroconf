@@ -205,6 +205,15 @@ sudo usermod -aG vboxusers marc
 rm Oracle_VM_VirtualBox_Extension_Pack-5.2.22.vbox-extpack
 reboot
 
+** Disable auto capture
+
+Auto capture prevents me from switching desktop when the focus is on
+the VistualBox window.
+
+- File -> Preferences
+- Input
+- Uncheck 'Auto Capture Keyboard'
+
 * Vagrant
 
 wget https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
