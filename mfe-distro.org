@@ -19,6 +19,10 @@ sudo gpasswd --add ${USER} dialout
 
 echo "export TERMINAL=\"gnome-terminal --hide-menubar\"" >> .bashrc
 
+* Configure key repeat
+
+echo "xset r rate 280 25" > ~/.xprofile
+
 * Configure i3
 
 mkdir -p ~/.config/i3
