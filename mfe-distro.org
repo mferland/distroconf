@@ -11,6 +11,11 @@ sudo apt install mesa-opencl-icd
 sudo apt install opencl-headers
 sudo apt install ocl-icd-opencl-dev
 
+Mesa and LLVM PPA:
+
+sudo add-apt-repository ppa:paulo-miguel-dias/pkppa
+sudo apt-get update
+
 * Add to dialout group
 
 sudo gpasswd --add ${USER} dialout
