@@ -52,29 +52,43 @@ cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 mkdir -p ~/.emacs.d/site-lisp/dash
 git clone https://github.com/magnars/dash.el.git ~/.emacs.d/site-lisp/dash
 cd ~/.emacs.d/site-lisp/dash
-git checkout -b mfe 2.14.1
+git checkout -b mfe 2.16.0
 
 ** with-editor (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/with-editor
 git clone https://github.com/magit/with-editor.git ~/.emacs.d/site-lisp/with-editor
 cd ~/.emacs.d/site-lisp/with-editor
-git checkout -b mfe v2.7.2
+git checkout -b mfe v2.8.1
 
 ** magit-popup (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/magit-popup
 git clone https://github.com/magit/magit-popup.git ~/.emacs.d/site-lisp/magit-popup
 cd ~/.emacs.d/site-lisp/magit-popup
-git checkout -b mfe v2.12.3
+git checkout -b mfe v2.13.0
 make
+
+** graph.el (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/graphql
+git clone https://github.com/vermiculus/graphql.el.git ~/.emacs.d/site-lisp/graphql
+cd ~/.emacs.d/site-lisp/graphql
+git checkout -b mfe 0.1.1
+
+** treepy.el (req. by magit)
+
+mkdir -p ~/.emacs.d/site-lisp/treepy
+git clone https://github.com/volrath/treepy.el ~/.emacs.d/site-lisp/treepy
+cd ~/.emacs.d/site-lisp/treepy
+git checkout -b mfe 0.1.1
 
 ** ghub (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/ghub
 git clone https://github.com/magit/ghub.git ~/.emacs.d/site-lisp/ghub
 cd ~/.emacs.d/site-lisp/ghub
-git checkout -b mfe v2.0.0
+git checkout -b mfe v3.2.0
 make
 
 ** magit
@@ -82,12 +96,14 @@ make
 mkdir -p ~/.emacs.d/site-lisp/magit
 git clone https://github.com/magit/magit.git ~/.emacs.d/site-lisp/magit
 cd ~/.emacs.d/site-lisp/magit
-git checkout -b mfe 2.12.1
+git checkout -b mfe v2.90.1
 echo "LOAD_PATH = -L ${HOME}/.emacs.d/site-lisp/magit/lisp" > config.mk
 echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/dash" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/with-editor" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/magit-popup" >> config.mk
 echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/ghub" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/graphql" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/magit-popup" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/treepy" >> config.mk
+echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/with-editor" >> config.mk
 make
 
 More info:
@@ -113,7 +129,7 @@ git checkout -b mfe v0.5.3
 mkdir -p ~/.emacs.d/site-lisp/helm
 git clone https://github.com/emacs-helm/helm.git ~/.emacs.d/site-lisp/helm
 cd ~/.emacs.d/site-lisp/helm
-git checkout -b mfe v2.9.2
+git checkout -b mfe v3.2
 EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
 
 ** expand-region
@@ -217,7 +233,7 @@ reboot
 ** Disable auto capture
 
 Auto capture prevents me from switching desktop when the focus is on
-the VistualBox window.
+the VirtualBox window.
 
 - File -> Preferences
 - Input
@@ -225,9 +241,9 @@ the VistualBox window.
 
 * Vagrant
 
-wget https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
-sudo dpkg -i vagrant_2.2.4_x86_64.deb
-rm vagrant_2.2.4_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
+sudo dpkg -i vagrant_2.2.5_x86_64.deb
+rm vagrant_2.2.5_x86_64.deb
 
 * Skype
 
