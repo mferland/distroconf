@@ -81,6 +81,12 @@
   (setq flycheck-gcc-language-standard "gnu99"))
 (add-hook 'c-mode-hook 'my-c-mode-hook)
 
+;; Python
+(defun my-python-mode-hook ()
+  (setq show-trailing-whitespace t)
+  (setq python-shell-interpreter "python3"))
+(add-hook 'python-mode-hook 'my-python-mode-hook)
+
 (global-set-key (kbd "C-.") 'other-window)
 (global-auto-revert-mode t)
 
