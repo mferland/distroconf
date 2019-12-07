@@ -179,6 +179,11 @@ git clone https://github.com/jorgenschaefer/circe ~/.emacs.d/site-lisp/circe
 mkdir -p ~/.emacs.d/site-lisp/emojify
 git clone https://github.com/iqbalansari/emacs-emojify.git ~/.emacs.d/site-lisp/emojify
 
+** ht (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/ht
+git clone https://github.com/Wilfred/ht.el.git ~/.emacs.d/site-lisp/ht
+
 ** oauth2 (slack)
 
 mkdir -p ~/.emacs.d/site-lisp/oauth2
