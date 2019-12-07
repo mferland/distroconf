@@ -164,6 +164,51 @@ git clone https://github.com/dominikh/go-mode.el.git ~/.emacs.d/site-lisp/go-mod
 mkdir -p ~/.emacs.d/site-lisp/ggtags
 git clone https://github.com/leoliu/ggtags.git ~/.emacs.d/site-lisp/ggtags
 
+** alert (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/alert
+git clone https://github.com/jwiegley/alert.git ~/.emacs.d/site-lisp/alert
+
+** circe (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/circe
+git clone https://github.com/jorgenschaefer/circe ~/.emacs.d/site-lisp/circe
+
+** emojify (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/emojify
+git clone https://github.com/iqbalansari/emacs-emojify.git ~/.emacs.d/site-lisp/emojify
+
+** oauth2 (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/oauth2
+git clone https://github.com/emacsmirror/oauth2.git ~/.emacs.d/site-lisp/oauth2
+
+** request (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/request
+git clone https://github.com/tkf/emacs-request.git ~/.emacs.d/site-lisp/request
+
+** websocket (slack)
+
+mkdir -p ~/.emacs.d/site-lisp/websocket
+git clone https://github.com/ahyatt/emacs-websocket.git ~/.emacs.d/site-lisp/websocket
+
+** slack
+
+mkdir -p ~/.emacs.d/site-lisp/slack
+git clone https://github.com/yuya373/emacs-slack.git ~/.emacs.d/site-lisp/slack
+
+Follow instructions at: https://github.com/yuya373/emacs-slack#how-to-get-token-the-harder-yet-officially-sanctioned-way
+
+*** Token
+
+Open and sign into the slack customization page,
+e.g. https://my.slack.com/customize, right click anywhere > inspect
+element. Open the console and paste:
+
+window.prompt("your api token is: ", TS.boot_data.api_token)
+
 * Install Emacs Server
 
 mkdir -p ~/.config/systemd/user
