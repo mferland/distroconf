@@ -228,6 +228,22 @@ echo "export EDITOR=~/bin/edit" >> ~/.bashrc
 cp ~/dev/mfedistro/lock ~/bin/lock
 chmod 755 ~/bin/lock
 
+* Weechat
+
+sudo apt-get install dirmngr gpg-agent apt-transport-https
+sudo apt-key adv --keyserver hkps://keys.openpgp.org --recv-keys 11E9DE8848F2B65222AA75B8D1820DB22A11534E
+echo "deb https://weechat.org/ubuntu bionic main" | sudo tee /etc/apt/sources.list.d/weechat.list
+echo "deb-src https://weechat.org/ubuntu bionic main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
+sudo apt-get update
+sudo apt-get install weechat-curses weechat-plugins weechat-python weechat-perl
+
+mkdir -p ~/.weechat/python/autoload
+cd ~/.weechat/python
+curl -O https://raw.githubusercontent.com/wee-slack/wee-slack/master/wee_slack.py
+ln -s ../wee_slack.py autoload
+
+See: https://github.com/wee-slack/wee-slack#3-start-weechat
+
 * Configure NFS mounts
 
 mkdir -p ~/nas/doc
