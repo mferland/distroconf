@@ -295,10 +295,10 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-wget https://download.virtualbox.org/virtualbox/5.2.32/Oracle_VM_VirtualBox_Extension_Pack-5.2.32.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.32.vbox-extpack
+wget https://download.virtualbox.org/virtualbox/5.2.38/Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
 sudo usermod -aG vboxusers marc
-rm Oracle_VM_VirtualBox_Extension_Pack-5.2.32.vbox-extpack
+rm Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
 reboot
 
 ** Disable auto capture
