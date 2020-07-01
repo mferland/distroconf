@@ -214,6 +214,11 @@ element. Open the console and paste:
 
 window.prompt("your api token is: ", TS.boot_data.api_token)
 
+** yaml
+
+mkdir -p ~/.emacs.d/site-lisp/yaml-mode
+git clone https://github.com/yoshiki/yaml-mode.git ~/.emacs.d/site-lisp/yaml-mode
+
 * Install Emacs Server
 
 mkdir -p ~/.config/systemd/user

@@ -39,6 +39,7 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/powerline")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/yaml-mode")
 ;; slack
 (add-to-list 'load-path "~/.emacs.d/site-lisp/alert")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/circe")
@@ -145,6 +146,11 @@
 ;; powerline
 (require 'powerline)
 (powerline-default-theme)
+
+;; yaml-mode
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
 
 ;; ;; emacs backup configuration
 (setq backup-directory-alist `(("." . "~/.saves")))
