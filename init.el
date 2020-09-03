@@ -35,19 +35,12 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/magit/lisp")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/magit-popup")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ghub")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/treepy")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/popup-el")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/powerline")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yaml-mode")
-;; slack
-(add-to-list 'load-path "~/.emacs.d/site-lisp/alert")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/circe")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emojify")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/oauth2")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/request")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/websocket")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/slack")
 
 ;; expand-region
 (require 'expand-region)

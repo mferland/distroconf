@@ -52,21 +52,21 @@ cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 mkdir -p ~/.emacs.d/site-lisp/dash
 git clone https://github.com/magnars/dash.el.git ~/.emacs.d/site-lisp/dash
 cd ~/.emacs.d/site-lisp/dash
-git checkout -b mfe 2.16.0
+git checkout -b mfe 2.17.0
 
 ** with-editor (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/with-editor
 git clone https://github.com/magit/with-editor.git ~/.emacs.d/site-lisp/with-editor
 cd ~/.emacs.d/site-lisp/with-editor
-git checkout -b mfe v2.8.1
+git checkout -b mfe v2.9.4
 
 ** magit-popup (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/magit-popup
 git clone https://github.com/magit/magit-popup.git ~/.emacs.d/site-lisp/magit-popup
 cd ~/.emacs.d/site-lisp/magit-popup
-git checkout -b mfe v2.13.0
+git checkout -b mfe v2.13.3
 make
 
 ** graph.el (req. by magit)
@@ -81,14 +81,14 @@ git checkout -b mfe 0.1.1
 mkdir -p ~/.emacs.d/site-lisp/treepy
 git clone https://github.com/volrath/treepy.el ~/.emacs.d/site-lisp/treepy
 cd ~/.emacs.d/site-lisp/treepy
-git checkout -b mfe 0.1.1
+git checkout -b mfe 0.1.2
 
 ** ghub (req. by magit)
 
 mkdir -p ~/.emacs.d/site-lisp/ghub
 git clone https://github.com/magit/ghub.git ~/.emacs.d/site-lisp/ghub
 cd ~/.emacs.d/site-lisp/ghub
-git checkout -b mfe v3.2.0
+git checkout -b mfe v3.4.1
 make
 
 ** magit
@@ -114,7 +114,7 @@ https://github.com/magit/magit/blob/master/Documentation/magit.org
 mkdir -p ~/.emacs.d/site-lisp/emacs-async
 git clone https://github.com/jwiegley/emacs-async.git ~/.emacs.d/site-lisp/emacs-async
 cd ~/.emacs.d/site-lisp/emacs-async
-git checkout -b mfe v1.9.3
+git checkout -b mfe v1.9.4
 make
 
 ** popup-el (req. by helm)
@@ -122,14 +122,14 @@ make
 mkdir -p ~/.emacs.d/site-lisp/popup-el
 git clone https://github.com/auto-complete/popup-el.git ~/.emacs.d/site-lisp/popup-el
 cd ~/.emacs.d/site-lisp/popup-el
-git checkout -b mfe v0.5.3
+git checkout -b mfe v0.5.8
 
 ** helm
 
 mkdir -p ~/.emacs.d/site-lisp/helm
 git clone https://github.com/emacs-helm/helm.git ~/.emacs.d/site-lisp/helm
 cd ~/.emacs.d/site-lisp/helm
-git checkout -b mfe v3.2
+git checkout -b mfe v3.6.5
 EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
 
 ** expand-region
@@ -235,10 +235,10 @@ chmod 755 ~/bin/lock
 
 * Weechat
 
-sudo apt-get install dirmngr gpg-agent apt-transport-https
+sudo apt-get install dirmngr gpg-agent apt-transport-https curl
 sudo apt-key adv --keyserver hkps://keys.openpgp.org --recv-keys 11E9DE8848F2B65222AA75B8D1820DB22A11534E
-echo "deb https://weechat.org/ubuntu bionic main" | sudo tee /etc/apt/sources.list.d/weechat.list
-echo "deb-src https://weechat.org/ubuntu bionic main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
+echo "deb https://weechat.org/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/weechat.list
+echo "deb-src https://weechat.org/ubuntu focal main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
 sudo apt-get update
 sudo apt-get install weechat-curses weechat-plugins weechat-python weechat-perl
 
@@ -279,10 +279,11 @@ ibus-setup
 
 * VirtualBox
 
-echo "deb http://download.virtualbox.org/virtualbox/debian bionic contrib" | sudo tee -a /etc/apt/sources.list
+echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian focal contrib" | sudo tee -a /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install -y virtualbox-5.2
+sudo apt-get install -y virtualbox-6.1
 sudo apt-get install -y dkms
 
 ** Install symlink to ~/mnt
@@ -295,10 +296,10 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-wget https://download.virtualbox.org/virtualbox/5.2.38/Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
+wget https://download.virtualbox.org/virtualbox/6.1.0_RC1/Oracle_VM_VirtualBox_Extension_Pack-6.1.0_RC1.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.1.0_RC1.vbox-extpack
 sudo usermod -aG vboxusers marc
-rm Oracle_VM_VirtualBox_Extension_Pack-5.2.38.vbox-extpack
+rm Oracle_VM_VirtualBox_Extension_Pack-6.1.0_RC1.vbox-extpack
 reboot
 
 ** Disable auto capture
@@ -312,9 +313,9 @@ the VirtualBox window.
 
 * Vagrant
 
-wget https://releases.hashicorp.com/vagrant/2.2.5/vagrant_2.2.5_x86_64.deb
-sudo dpkg -i vagrant_2.2.5_x86_64.deb
-rm vagrant_2.2.5_x86_64.deb
+wget https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.deb
+sudo dpkg -i vagrant_2.2.10_x86_64.deb
+rm vagrant_2.2.10_x86_64.deb
 
 * Skype
 
@@ -341,7 +342,7 @@ sudo apt-get install -y apt-transport-https ca-certificates curl software-proper
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 # Note: Artful package still not available, this is why I'm using zesty
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu zesty stable"
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce
 # test
