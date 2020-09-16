@@ -253,7 +253,7 @@ chmod 755 ~/bin/lock
 
 * Weechat
 
-sudo apt-get install dirmngr gpg-agent apt-transport-https curl
+sudo apt install dirmngr gpg-agent apt-transport-https curl
 sudo apt-key adv --keyserver hkps://keys.openpgp.org --recv-keys 11E9DE8848F2B65222AA75B8D1820DB22A11534E
 echo "deb https://weechat.org/ubuntu hirsute main" | sudo tee /etc/apt/sources.list.d/weechat.list
 echo "deb-src https://weechat.org/ubuntu hirsute main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
