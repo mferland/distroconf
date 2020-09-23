@@ -1,6 +1,6 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email afl xvnc4viewer python3-pip bison flex libssl-dev global nmap python-pygments bmap-tools
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs25 i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc python-minimal dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email afl xvnc4viewer python3-pip bison flex libssl-dev global nmap python-pygments bmap-tools fonts-terminus
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
@@ -289,7 +289,6 @@ sudo apt-get install -y dkms
 ** Install symlink to ~/mnt
 
 cd
-mkdir VirtualBox\ VMs
 ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 ** Install Extension Pack (for USB2-3 support)
@@ -341,7 +340,6 @@ sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
-# Note: Artful package still not available, this is why I'm using zesty
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce
@@ -360,7 +358,7 @@ sudo dpkg-reconfigure libdvd-pkg
 
 * Terminal
 
-Monospace Regular 12
+Terminus TTF Medium
 
 * git
 
