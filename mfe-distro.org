@@ -1,6 +1,6 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email xvnc4viewer python3-pip bison flex libssl-dev global nmap python-pygments bmap-tools fonts-terminus chrpath gawk
+sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email xvnc4viewer python3-pip bison flex libssl-dev global nmap python-pygments bmap-tools fonts-terminus chrpath gawk jq
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
