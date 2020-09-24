@@ -326,7 +326,6 @@ sudo dpkg -i skypeforlinux-64.deb
 Go to: https://www.nxp.com/pages/pins-tool-for-i.mx-application-processors:PINS-TOOL-IMX?tab=Design_Tools_Tab
 sudo dpkg -i pins-tool-for-imx-processors-v5-1_amd64.deb
 
-* Install ssh key pair
 * Spotify
 
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
@@ -412,3 +411,9 @@ mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
+* ssh config
+
+mkdir -p ~/.ssh
+cat <<EOF > ~/.ssh/config
+AddKeysToAgent yes
+EOF
