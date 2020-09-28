@@ -247,6 +247,13 @@ cd ~/.weechat/python
 curl -O https://raw.githubusercontent.com/wee-slack/wee-slack/master/wee_slack.py
 ln -s ../wee_slack.py autoload
 
+# get emoji support
+cd ~/.weechat/
+wget https://raw.githubusercontent.com/wee-slack/wee-slack/master/weemoji.json
+# in weechat:
+/python reload slack
+/set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(emoji)"
+
 See: https://github.com/wee-slack/wee-slack#3-start-weechat
 
 * Configure NFS mounts
