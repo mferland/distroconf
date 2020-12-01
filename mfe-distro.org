@@ -382,7 +382,7 @@ touch ~/.dput.cf
 echo "[mentors]" >> ~/.dput.cf
 echo "fqdn = mentors.debian.net" >> ~/.dput.cf
 echo "incoming = /upload" >> ~/.dput.cf
-echo "method = http" >> ~/.dput.cf
+echo "method = https" >> ~/.dput.cf
 echo "allow_unsigned_uploads = 0" >> ~/.dput.cf
 echo "progress_indicator = 2" >> ~/.dput.cf
 echo "# Allow uploads for UNRELEASED packages" >> ~/.dput.cf
