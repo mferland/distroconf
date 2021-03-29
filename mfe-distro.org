@@ -5,6 +5,8 @@ mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
 
+sudo snap install flameshot
+
 * OpenCL
 
 sudo apt install mesa-opencl-icd
