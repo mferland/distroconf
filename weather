@@ -1,0 +1,9 @@
+#!/bin/sh
+
+weather=$(curl -s "https://micro-weather.vercel.app/?city=quebec&country=canada")
+min_temp=$(echo $weather|jq .temp_min)
+condition=$(echo $weather|jq .condition|tr '"' ' ')
+hum=$(echo $weather|jq .humidity)
+echo $min_temp"°C -"$condition"(%"$hum")"
+
+exit 0

@@ -1,4 +1,11 @@
 ;; Look & feel
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (setq inhibit-startup-screen t)
 (set-default-font "DejaVu Sans Mono-9")
 (scroll-bar-mode -1)
@@ -35,12 +42,13 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/magit/lisp")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/magit-popup")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ghub")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/treepy")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/popup-el")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/with-editor")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/dts-mode")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/powerline")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/yaml-mode")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/treepy")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/zig-mode")
 
 ;; expand-region
 (require 'expand-region)
@@ -82,9 +90,10 @@
 
 ;; Python
 (defun my-python-mode-hook ()
-  (setq show-trailing-whitespace t)
-  (setq python-shell-interpreter "python3"))
+  (setq show-trailing-whitespace t))
 (add-hook 'python-mode-hook 'my-python-mode-hook)
+;; Prefer python3 over python
+(setq python-shell-interpreter "python3")
 
 (global-set-key (kbd "C-.") 'other-window)
 (global-auto-revert-mode t)
@@ -144,6 +153,16 @@
 (require 'yaml-mode)
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
+
+;; zig-mode
+(require 'zig-mode)
+
+;; use minted for latex listings
+(setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 ;; ;; emacs backup configuration
 (setq backup-directory-alist `(("." . "~/.saves")))
@@ -227,3 +246,20 @@
 ;;  ;; Your init file should contain only one such instance.
 ;;  ;; If there is more than one, they won't work right.
 ;;  )
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (persistent-scratch))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+;; persistent scratch buffer
+(persistent-scratch-setup-default)

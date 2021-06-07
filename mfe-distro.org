@@ -33,13 +33,18 @@ echo "xset r rate 280 25" > ~/.xprofile
 * Configure i3
 
 mkdir -p ~/.config/i3
+mkdir -p ~/.config/i3status
+mkdir -p ~/.config/i3blocks
+
 cp ~/dev/mfedistro/i3.conf ~/.config/i3/config
+cp ~/dev/mfedistro/i3status.conf ~/.config/i3status/config
+cp ~/dev/mfedistro/i3blocks.conf ~/.config/i3blocks/config
 
 * Install fonts
 
 cd ~
-mkdir .fonts && cd .fonts
-wget https://cdn.proggyfonts.net/wp-content/downloads/ProggyClean.ttf.zip
+mkdir -p .fonts && cd .fonts
+wget http://upperbounds.net/download/download_bridge.php?get=ProggyClean.ttf.zip -O ProggyClean.ttf.zip
 unzip ProggyClean.ttf.zip
 rm Licence.txt Readme.txt ProggyClean.ttf.zip
 
@@ -161,10 +166,21 @@ git clone https://github.com/milkypostman/powerline.git ~/.emacs.d/site-lisp/pow
 mkdir -p ~/.emacs.d/site-lisp/go-mode
 git clone https://github.com/dominikh/go-mode.el.git ~/.emacs.d/site-lisp/go-mode
 
+** persistant-scratch
+
+mkdir -p ~/.emacs.d/site-lisp/persistent-scratch
+git clone https://github.com/Fanael/persistent-scratch.git ~/.emacs.d/site-lisp/persistent-scratch
+
 ** ggtags
+
 
 mkdir -p ~/.emacs.d/site-lisp/ggtags
 git clone https://github.com/leoliu/ggtags.git ~/.emacs.d/site-lisp/ggtags
+
+** zig-mode
+
+mkdir -p ~/.emacs.d/site-lisp/zig-mode
+git clone https://github.com/ziglang/zig-mode.git ~/.emacs.d/site-lisp/zig-mode
 
 ** alert (slack)
 
@@ -239,8 +255,8 @@ chmod 755 ~/bin/lock
 
 sudo apt-get install dirmngr gpg-agent apt-transport-https curl
 sudo apt-key adv --keyserver hkps://keys.openpgp.org --recv-keys 11E9DE8848F2B65222AA75B8D1820DB22A11534E
-echo "deb https://weechat.org/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/weechat.list
-echo "deb-src https://weechat.org/ubuntu focal main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
+echo "deb https://weechat.org/ubuntu hirsute main" | sudo tee /etc/apt/sources.list.d/weechat.list
+echo "deb-src https://weechat.org/ubuntu hirsute main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
 sudo apt-get update
 sudo apt-get install weechat-curses weechat-plugins weechat-python weechat-perl
 
@@ -248,6 +264,7 @@ mkdir -p ~/.weechat/python/autoload
 cd ~/.weechat/python
 curl -O https://raw.githubusercontent.com/wee-slack/wee-slack/master/wee_slack.py
 ln -s ../wee_slack.py autoload
+sudo apt install python3-websocket
 
 # get emoji support
 cd ~/.weechat/
@@ -255,6 +272,8 @@ wget https://raw.githubusercontent.com/wee-slack/wee-slack/master/weemoji.json
 # in weechat:
 /python reload slack
 /set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(emoji)"
+
+Team: amotusteam.slack.com
 
 See: https://github.com/wee-slack/wee-slack#3-start-weechat
 
@@ -304,10 +323,10 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-wget https://download.virtualbox.org/virtualbox/6.1.18/Oracle_VM_VirtualBox_Extension_Pack-6.1.18.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.1.18.vbox-extpack
+wget https://download.virtualbox.org/virtualbox/6.1.22/Oracle_VM_VirtualBox_Extension_Pack-6.1.22.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.1.22.vbox-extpack
 sudo usermod -aG vboxusers marc
-rm Oracle_VM_VirtualBox_Extension_Pack-6.1.18.vbox-extpack
+rm Oracle_VM_VirtualBox_Extension_Pack-6.1.22.vbox-extpack
 reboot
 
 ** Disable auto capture
@@ -348,7 +367,7 @@ sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu hirsute stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce
 # test
