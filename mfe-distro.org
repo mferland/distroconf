@@ -54,188 +54,10 @@ mkdir -p ~/.emacs.d/site-lisp
 mkdir -p ~/.saves
 cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 
-** Dash (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/dash
-git clone https://github.com/magnars/dash.el.git ~/.emacs.d/site-lisp/dash
-cd ~/.emacs.d/site-lisp/dash
-git checkout -b mfe 2.17.0
-
-** with-editor (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/with-editor
-git clone https://github.com/magit/with-editor.git ~/.emacs.d/site-lisp/with-editor
-cd ~/.emacs.d/site-lisp/with-editor
-git checkout -b mfe v2.9.4
-
-** magit-popup (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/magit-popup
-git clone https://github.com/magit/magit-popup.git ~/.emacs.d/site-lisp/magit-popup
-cd ~/.emacs.d/site-lisp/magit-popup
-git checkout -b mfe v2.13.3
-make
-
-** graph.el (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/graphql
-git clone https://github.com/vermiculus/graphql.el.git ~/.emacs.d/site-lisp/graphql
-cd ~/.emacs.d/site-lisp/graphql
-git checkout -b mfe 0.1.1
-
-** treepy.el (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/treepy
-git clone https://github.com/volrath/treepy.el ~/.emacs.d/site-lisp/treepy
-cd ~/.emacs.d/site-lisp/treepy
-git checkout -b mfe 0.1.2
-
-** ghub (req. by magit)
-
-mkdir -p ~/.emacs.d/site-lisp/ghub
-git clone https://github.com/magit/ghub.git ~/.emacs.d/site-lisp/ghub
-cd ~/.emacs.d/site-lisp/ghub
-git checkout -b mfe v3.4.1
-make
-
-** magit
-
-mkdir -p ~/.emacs.d/site-lisp/magit
-git clone https://github.com/magit/magit.git ~/.emacs.d/site-lisp/magit
-cd ~/.emacs.d/site-lisp/magit
-git checkout -b mfe v2.90.1
-echo "LOAD_PATH = -L ${HOME}/.emacs.d/site-lisp/magit/lisp" > config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/dash" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/ghub" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/graphql" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/magit-popup" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/treepy" >> config.mk
-echo "LOAD_PATH += -L ${HOME}/.emacs.d/site-lisp/with-editor" >> config.mk
-make
-
-More info:
-https://github.com/magit/magit/blob/master/Documentation/magit.org
-
-** emacs-async (req. by helm)
-
-mkdir -p ~/.emacs.d/site-lisp/emacs-async
-git clone https://github.com/jwiegley/emacs-async.git ~/.emacs.d/site-lisp/emacs-async
-cd ~/.emacs.d/site-lisp/emacs-async
-git checkout -b mfe v1.9.4
-make
-
-** popup-el (req. by helm)
-
-mkdir -p ~/.emacs.d/site-lisp/popup-el
-git clone https://github.com/auto-complete/popup-el.git ~/.emacs.d/site-lisp/popup-el
-cd ~/.emacs.d/site-lisp/popup-el
-git checkout -b mfe v0.5.8
-
-** helm
-
-mkdir -p ~/.emacs.d/site-lisp/helm
-git clone https://github.com/emacs-helm/helm.git ~/.emacs.d/site-lisp/helm
-cd ~/.emacs.d/site-lisp/helm
-git checkout -b mfe v3.6.5
-EMACSLOADPATH="${HOME}/.emacs.d/site-lisp/emacs-async:" make
-
-** expand-region
-
-mkdir -p ~/.emacs.d/site-lisp/expand-region
-git clone https://github.com/magnars/expand-region.el.git ~/.emacs.d/site-lisp/expand-region
-cd ~/.emacs.d/site-lisp/expand-region
-git checkout -b mfe 0.11.0
-
 ** bb-mode
 
 mkdir -p ~/.emacs.d/site-lisp/bb-mode
 git clone https://github.com/mferland/bb-mode.git ~/.emacs.d/site-lisp/bb-mode
-
-** dts-mode
-
-mkdir -p ~/.emacs.d/site-lisp/dts-mode
-git clone https://github.com/bgamari/dts-mode.git ~/.emacs.d/site-lisp/dts-mode
-
-** powerline
-
-mkdir -p ~/.emacs.d/site-lisp/powerline
-git clone https://github.com/milkypostman/powerline.git ~/.emacs.d/site-lisp/powerline
-
-** go-mode
-
-mkdir -p ~/.emacs.d/site-lisp/go-mode
-git clone https://github.com/dominikh/go-mode.el.git ~/.emacs.d/site-lisp/go-mode
-
-** persistant-scratch
-
-mkdir -p ~/.emacs.d/site-lisp/persistent-scratch
-git clone https://github.com/Fanael/persistent-scratch.git ~/.emacs.d/site-lisp/persistent-scratch
-
-** ggtags
-
-
-mkdir -p ~/.emacs.d/site-lisp/ggtags
-git clone https://github.com/leoliu/ggtags.git ~/.emacs.d/site-lisp/ggtags
-
-** zig-mode
-
-mkdir -p ~/.emacs.d/site-lisp/zig-mode
-git clone https://github.com/ziglang/zig-mode.git ~/.emacs.d/site-lisp/zig-mode
-
-** alert (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/alert
-git clone https://github.com/jwiegley/alert.git ~/.emacs.d/site-lisp/alert
-
-** circe (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/circe
-git clone https://github.com/jorgenschaefer/circe ~/.emacs.d/site-lisp/circe
-
-** emojify (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/emojify
-git clone https://github.com/iqbalansari/emacs-emojify.git ~/.emacs.d/site-lisp/emojify
-
-** ht (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/ht
-git clone https://github.com/Wilfred/ht.el.git ~/.emacs.d/site-lisp/ht
-
-** oauth2 (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/oauth2
-git clone https://github.com/emacsmirror/oauth2.git ~/.emacs.d/site-lisp/oauth2
-
-** request (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/request
-git clone https://github.com/tkf/emacs-request.git ~/.emacs.d/site-lisp/request
-
-** websocket (slack)
-
-mkdir -p ~/.emacs.d/site-lisp/websocket
-git clone https://github.com/ahyatt/emacs-websocket.git ~/.emacs.d/site-lisp/websocket
-
-** slack
-
-mkdir -p ~/.emacs.d/site-lisp/slack
-git clone https://github.com/yuya373/emacs-slack.git ~/.emacs.d/site-lisp/slack
-
-Follow instructions at: https://github.com/yuya373/emacs-slack#how-to-get-token-the-harder-yet-officially-sanctioned-way
-
-*** Token
-
-Open and sign into the slack customization page,
-e.g. https://my.slack.com/customize, right click anywhere > inspect
-element. Open the console and paste:
-
-window.prompt("your api token is: ", TS.boot_data.api_token)
-
-** yaml
-
-mkdir -p ~/.emacs.d/site-lisp/yaml-mode
-git clone https://github.com/yoshiki/yaml-mode.git ~/.emacs.d/site-lisp/yaml-mode
 
 * Install Emacs Server
 
@@ -429,16 +251,13 @@ cp mykey_*.gpg ~/nas/??
 cp -a ~/.ssh ~/nas/??
 >>>>>>> Add more stuff
 
-** Firefox
-
-Export bookmarks.
-
 * WORK
 
 mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
+
 * ssh config
 
 mkdir -p ~/.ssh
