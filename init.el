@@ -1,11 +1,4 @@
 ;; Look & feel
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
-
 (setq inhibit-startup-screen t)
 (set-default-font "DejaVu Sans Mono-9")
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9"))
@@ -108,10 +101,9 @@
 
 ;; Python
 (defun my-python-mode-hook ()
-  (setq show-trailing-whitespace t))
+  (setq show-trailing-whitespace t)
+  (setq python-shell-interpreter "python3"))
 (add-hook 'python-mode-hook 'my-python-mode-hook)
-;; Prefer python3 over python
-(setq python-shell-interpreter "python3")
 
 ;; AUCTex
 (setq TeX-auto-save t)
