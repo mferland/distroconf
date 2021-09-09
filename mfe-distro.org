@@ -73,6 +73,20 @@ echo "export EDITOR=~/bin/edit" >> ~/.bashrc
 cp ~/dev/mfedistro/lock ~/bin/lock
 chmod 755 ~/bin/lock
 
+* Install ssh-agent
+
+cp ~/dev/mfedistro/ssh-agent.service ~/.config/systemd/user
+systemctl --user enable ssh-agent
+systemctl --user start ssh-agent
+
+echo 'eval $(systemctl --user show-environment | grep SSH_AUTH_SOCK)' >> ~/.bash_profile
+echo 'export SSH_AUTH_SOCK' >> ~/.bash_profile
+
+mkdir -p ~/.ssh
+cat <<EOF > ~/.ssh/config
+AddKeysToAgent yes
+EOF
+
 * Weechat
 
 sudo apt install dirmngr gpg-agent apt-transport-https curl
@@ -257,10 +271,5 @@ mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
+<<<<<<< Updated upstream
 
-* ssh config
-
-mkdir -p ~/.ssh
-cat <<EOF > ~/.ssh/config
-AddKeysToAgent yes
-EOF
