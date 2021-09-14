@@ -54,6 +54,8 @@ mkdir -p ~/.emacs.d/site-lisp
 mkdir -p ~/.saves
 cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
 
+Note: remove ~/.emacs.d/elpa if it exists.
+
 ** bb-mode
 
 mkdir -p ~/.emacs.d/site-lisp/bb-mode
