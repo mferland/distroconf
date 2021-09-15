@@ -27,9 +27,7 @@
 
 (setenv "SSH_AUTH_SOCK" (concat (getenv "HOME") "/.ssh-auth-sock"))
 
-;; Require and initialize package.
 (require 'package)
-(package-initialize)
 
 ;; Add MELPA to package-archives.
 (add-to-list 'package-archives
