@@ -14,7 +14,12 @@
 (setq-default indicate-empty-lines +1)
 (setq-default indent-tabs-mode nil)
 
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
+(defun mfe/kill-this-buffer ()
+  "Kill the current buffer."
+  (interactive)
+  (kill-buffer (current-buffer)))
+
+(global-set-key (kbd "C-x k") 'mfe/kill-this-buffer)
 (global-set-key (kbd "C-.") 'other-window)
 (global-auto-revert-mode t)
 
