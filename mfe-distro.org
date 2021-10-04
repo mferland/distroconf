@@ -1,6 +1,56 @@
 * Install dependencies
 
-sudo apt install -y git libtool gcc autotools-dev autoconf pkg-config zlib1g-dev check emacs i3 tree htop gitk texinfo texlive-full nfs-common gnuplot-x11 vlc dvdbackup mkisofs libtool-bin devscripts astyle openssh-server git-lfs picocom ncurses-dev lzop libncursesw5-dev rpm2cpio filezilla ubuntu-restricted-extras valgrind brasero git-email xvnc4viewer python3-pip bison flex libssl-dev global nmap python-pygments bmap-tools fonts-terminus chrpath gawk jq libusb-1.0.0-dev cmake
+sudo apt install -y astyle \
+autoconf \
+autotools-dev \
+bison \
+bmap-tools \
+brasero \
+check \
+chrpath \
+cmake \
+devscripts \
+dvdbackup \
+emacs \
+filezilla \
+flex \
+fonts-terminus \
+gawk \
+gcc \
+git \
+git-email \
+git-lfs \
+gitk \
+global \
+gnuplot-x11 \
+htop \
+i3 \
+jq \
+libncursesw5-dev \
+libssl-dev \
+libtool \
+libtool-bin \
+libusb-1.0.0-dev \
+lzop \
+mkisofs \
+ncurses-dev \
+nfs-common \
+nmap \
+openssh-server \
+picocom \
+pkg-config \
+python-pygments \
+python3-pip \
+rpm2cpio \
+texinfo \
+texlive-full \
+tree \
+ubuntu-restricted-extras \
+valgrind \
+vlc \
+xvnc4viewer \
+zlib1g-dev
+
 mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/mferland/distroconf.git mfedistro
