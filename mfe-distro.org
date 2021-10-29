@@ -26,6 +26,7 @@ gnuplot-x11 \
 htop \
 i3 \
 jq \
+libelf-dev \
 libncursesw5-dev \
 libssl-dev \
 libtool \
