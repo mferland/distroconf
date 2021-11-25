@@ -134,6 +134,36 @@
   :init
   (global-set-key (kbd "C-=") 'er/expand-region))
 
+;; (defun my-org-screenshot ()
+;;   "Take a screenshot into a time stamped unique-named file in the
+;; same directory as the org-buffer and insert a link to this file."
+;;   (interactive)
+;;   (setq filename
+;;         (concat
+;;          (make-temp-name
+;;           (concat (buffer-file-name)
+;;                   "_"
+;;                   (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+;;   (call-process "import" nil nil nil filename)
+;;   (insert (concat "[[" filename "]]"))
+;;   (org-display-inline-images))
+
+(defun mfe/org-screenshot-from-clipboard ()
+  "Take screenshot from clipboard, copy it to the same directory
+  as the org-buffer and insert a link to this file."
+  (interactive)
+  (setq filename
+	(concat
+	 (make-temp-name
+	  (concat (buffer-file-name)
+		  "_"
+		  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (message "Saving screenshot to: %s" filename)
+  ;; (call-process "xclip" nil  "-selection" "clipboard" "-t" "image/png -o" filename)
+  (shell-command-to-string (concat "/usr/bin/xclip -selection clipboard -t image/png -o > " filename))
+  (insert (concat "[[" filename "]]"))
+  (org-display-inline-images))
+
 (use-package org-roam
   :ensure t
   :init
