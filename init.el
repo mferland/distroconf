@@ -1,5 +1,6 @@
 ;; Look & feel
 (setq inhibit-startup-screen t)
+;; (set-default-font "DejaVu Sans Mono-9")
 (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-9"))
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
