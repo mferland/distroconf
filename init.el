@@ -22,6 +22,7 @@
 
 (global-set-key (kbd "C-x k") 'mfe/kill-this-buffer)
 (global-set-key (kbd "C-.") 'other-window)
+(global-set-key (kbd "M-*") 'pop-tag-mark)
 (global-auto-revert-mode t)
 
 ;; Always ask before quitting Emacs
