@@ -79,7 +79,7 @@ echo "export TERMINAL=\"gnome-terminal --hide-menubar\"" >> .bashrc
 
 * Configure key repeat
 
-echo "xset r rate 280 25" > ~/.xprofile
+echo "xset r rate 300 40" > ~/.xprofile
 
 * Configure i3
 
