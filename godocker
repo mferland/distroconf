@@ -1,5 +1,7 @@
 #!/bin/sh
 
+DISTRO="ubuntu-20.04"
+
 if [ -z ${BASEDIR} ]; then
     echo >&2 "NOTE: Variable BASEDIR undefined, using ~/mnt/projet."
     BASEDIR=~/mnt/projet
@@ -8,6 +10,12 @@ fi
 if [ -z "${1}" ]; then
     echo >&2 "ERROR: No projet name given."
     exit 1
+fi
+
+if [ -z "${2}" ]; then
+    echo >&2 "NOTE: No distro given, using ubuntu-20.04"
+else
+    DISTRO=${2}
 fi
 
 P=$(realpath ${BASEDIR}/${1})
@@ -22,6 +30,8 @@ echo "Using ${B} as base path"
 echo "Using ${P} as project path"
 
 CMD="docker run --rm -it \
+--name yocto-${1} \
+--cap-add=SYS_PTRACE \
 -v $SSH_AUTH_SOCK:/ssh-agent \
 --env SSH_AUTH_SOCK=/ssh-agent \
 -v ${P}:/workdir \
@@ -29,7 +39,7 @@ CMD="docker run --rm -it \
 -v ${B}/yocto-sstate-cache:/sstate-cache \
 -v ${HOME}/.ssh/config:/etc/ssh/ssh_config.d/config \
 -v ${HOME}/.ssh/known_hosts:/etc/ssh/ssh_known_hosts \
-crops/poky:ubuntu-20.04 \
+crops/poky:${DISTRO} \
 --workdir=/workdir"
 
 echo ${CMD}
