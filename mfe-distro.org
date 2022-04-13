@@ -43,6 +43,7 @@ pkg-config \
 python-pygments \
 python3-pip \
 rpm2cpio \
+fonts-terminus \
 texinfo \
 texlive-full \
 tree \
@@ -144,27 +145,11 @@ EOF
 
 sudo apt install dirmngr gpg-agent apt-transport-https curl
 sudo apt-key adv --keyserver hkps://keys.openpgp.org --recv-keys 11E9DE8848F2B65222AA75B8D1820DB22A11534E
-echo "deb [arch=amd64] https://weechat.org/ubuntu hirsute main" | sudo tee /etc/apt/sources.list.d/weechat.list
-echo "deb-src [arch=amd64] https://weechat.org/ubuntu hirsute main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
+RELEASE=$(lsb_release -cs)
+echo "deb [arch=amd64] https://weechat.org/ubuntu ${RELEASE} main" | sudo tee /etc/apt/sources.list.d/weechat.list
+echo "deb-src [arch=amd64] https://weechat.org/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
 sudo apt-get update
 sudo apt-get install weechat-curses weechat-plugins weechat-python weechat-perl
-
-mkdir -p ~/.weechat/python/autoload
-cd ~/.weechat/python
-curl -O https://raw.githubusercontent.com/wee-slack/wee-slack/master/wee_slack.py
-ln -s ../wee_slack.py autoload
-sudo apt install python3-websocket
-
-# get emoji support
-cd ~/.weechat/
-wget https://raw.githubusercontent.com/wee-slack/wee-slack/master/weemoji.json
-# in weechat:
-/python reload slack
-/set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(emoji)"
-
-Team: amotusteam.slack.com
-
-See: https://github.com/wee-slack/wee-slack#3-start-weechat
 
 * Configure NFS mounts
 
@@ -196,7 +181,7 @@ ibus-setup
 
 * VirtualBox
 
-echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian focal contrib" | sudo tee -a /etc/apt/sources.list
+echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian hirsute contrib" | sudo tee -a /etc/apt/sources.list
 wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
 wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
 sudo apt-get update
@@ -212,12 +197,11 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-wget https://download.virtualbox.org/virtualbox/6.1.26/Oracle_VM_VirtualBox_Extension_Pack-6.1.26.vbox-extpack
-wget https://download.virtualbox.org/virtualbox/6.1.30/Oracle_VM_VirtualBox_Extension_Pack-6.1.30.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.1.26.vbox-extpack
-sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.1.30.vbox-extpack
+export VBOXVER=6.1.32
+wget https://download.virtualbox.org/virtualbox/${VBOXVER}/Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
+sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 sudo usermod -aG vboxusers marc
-rm Oracle_VM_VirtualBox_Extension_Pack-6.1.30.vbox-extpack
+rm Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 reboot
 
 ** Disable auto capture
@@ -263,6 +247,8 @@ sudo apt-get update
 sudo apt-get install -y docker-ce
 # test
 sudo docker run hello-world
+# add myself to docker group
+sudo usermod -aG docker $USER
 
 * i3status
 
@@ -318,7 +304,6 @@ cp mykey_*.gpg ~/nas/??
 ** SSH
 
 cp -a ~/.ssh ~/nas/??
->>>>>>> Add more stuff
 
 * WORK
 
@@ -326,5 +311,3 @@ mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
-<<<<<<< Updated upstream
-
