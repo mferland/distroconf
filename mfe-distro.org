@@ -31,7 +31,7 @@ libncursesw5-dev \
 libssl-dev \
 libtool \
 libtool-bin \
-libusb-1.0.0-dev \
+libusb-1.0-0-dev \
 lzop \
 mkisofs \
 ncurses-dev \
@@ -40,7 +40,6 @@ nmap \
 openssh-server \
 picocom \
 pkg-config \
-python-pygments \
 python3-pip \
 rpm2cpio \
 fonts-terminus \
@@ -50,7 +49,6 @@ tree \
 ubuntu-restricted-extras \
 valgrind \
 vlc \
-xvnc4viewer \
 zlib1g-dev
 
 mkdir -p ~/dev
@@ -141,6 +139,12 @@ cat <<EOF > ~/.ssh/config
 AddKeysToAgent yes
 EOF
 
+* Install langtool service
+
+sudo cp ~/dev/mfedistro/langtool.service /etc/systemd/system
+sudo systemctl enable langtool.service
+sudo systemctl start langtool.service
+
 * Weechat
 
 sudo apt install dirmngr gpg-agent apt-transport-https curl
@@ -150,6 +154,19 @@ echo "deb [arch=amd64] https://weechat.org/ubuntu ${RELEASE} main" | sudo tee /e
 echo "deb-src [arch=amd64] https://weechat.org/ubuntu ${RELEASE} main" | sudo tee -a /etc/apt/sources.list.d/weechat.list
 sudo apt-get update
 sudo apt-get install weechat-curses weechat-plugins weechat-python weechat-perl
+
+* Debug Symbol Packages
+
+echo "deb http://ddebs.ubuntu.com $(lsb_release -cs) main restricted universe multiverse
+deb http://ddebs.ubuntu.com $(lsb_release -cs)-updates main restricted universe multiverse
+deb http://ddebs.ubuntu.com $(lsb_release -cs)-proposed main restricted universe multiverse" | \
+sudo tee -a /etc/apt/sources.list.d/ddebs.list
+
+sudo apt install ubuntu-dbgsym-keyring
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F2EDC64DC5AEE1F6B9C621F0C8CAB6595FDFF622
+
+sudo apt-get update
 
 * Configure NFS mounts
 
@@ -238,17 +255,20 @@ sudo apt-get install -y spotify-client
 
 * Docker
 
-sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo apt-key fingerprint 0EBFCD88
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu hirsute stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce
-# test
-sudo docker run hello-world
-# add myself to docker group
-sudo usermod -aG docker $USER
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+apt-cache policy docker-ce
+# make sure we are pulling from docker repo
+sudo apt install docker-ce
+sudo systemctl status docker
+
+sudo usermod -aG docker ${USER}
+su - ${USER}
+# make sure you are in the docker group
+groups
 
 * i3status
 

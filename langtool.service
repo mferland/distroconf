@@ -1,0 +1,16 @@
+[Unit]
+Description=Langtool Container Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run --rm --name langtool-1 -p 8010:8010 erikvl87/languagetool
+ExecStop=/usr/bin/docker stop -t 2 langtool-1
+
+# Remove the limit in startup time since pulling the docker image can
+# take quite some time.
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
