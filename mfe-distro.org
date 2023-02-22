@@ -214,7 +214,7 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-export VBOXVER=6.1.32
+export VBOXVER=6.1.36
 wget https://download.virtualbox.org/virtualbox/${VBOXVER}/Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 sudo usermod -aG vboxusers marc
