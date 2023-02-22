@@ -139,6 +139,10 @@ cat <<EOF > ~/.ssh/config
 AddKeysToAgent yes
 EOF
 
+* Add ${HOME}/.local/bin to PATH
+
+echo 'export PATH=${HOME}/.local/bin:${PATH}' >> ~/.bashrc
+
 * Install langtool service
 
 sudo cp ~/dev/mfedistro/langtool.service /etc/systemd/system
