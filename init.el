@@ -109,6 +109,13 @@
   (setq python-shell-interpreter "python3"))
 (add-hook 'python-mode-hook 'my-python-mode-hook)
 
+;; DTS
+(defun my-dts-mode-hook ()
+  (setq whitespace-style
+   '(face tabs spaces trailing lines space-before-tab newline indentation empty space-after-tab tab-mark))
+  (whitespace-mode))
+(add-hook 'dts-mode-hook 'my-dts-mode-hook)
+
 ;; AUCTex
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
@@ -234,6 +241,17 @@
   (setq langtool-http-server-host "localhost")
   (setq langtool-http-server-port 8010))
 
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+
+(use-package php-mode
+  :ensure t)
+
+(use-package web-mode
+  :ensure t)
+
 (setq browse-url-browser-function #'w3m-browse-url)
 
 (custom-set-variables
@@ -242,7 +260,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(langtool kconfig-mode w3m dockerfile-mode systemd cmake-mode yaml-mode powerline expand-region use-package org-roam magit lsp-ui lsp-treemacs helm-lsp helm-dash flycheck dts-mode company)))
+   '(web-mode php-mode markdown-mode langtool kconfig-mode w3m dockerfile-mode systemd cmake-mode yaml-mode powerline expand-region use-package org-roam magit lsp-ui lsp-treemacs helm-lsp helm-dash flycheck dts-mode company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
