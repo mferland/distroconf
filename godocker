@@ -29,11 +29,14 @@ B=$(realpath ${BASEDIR})
 echo "Using ${B} as base path"
 echo "Using ${P} as project path"
 
-CMD="docker run --rm -it \
+# --cap-add=SYS_PTRACE \
+
+# --mount type=bind,src=$SSH_AUTH_SOCK,dst=/ssh-auth.sock \
+# -e SSH_AUTH_SOCK=/ssh-auth.sock \
+
+CMD="docker run -it --rm=true \
 --name yocto-${1} \
---cap-add=SYS_PTRACE \
--v $SSH_AUTH_SOCK:/ssh-agent \
---env SSH_AUTH_SOCK=/ssh-agent \
+-v "$SSH_AUTH_SOCK:$SSH_AUTH_SOCK" -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
 -v ${P}:/workdir \
 -v ${B}/yocto-downloads:/downloads \
 -v ${B}/yocto-sstate-cache:/sstate-cache \
