@@ -173,6 +173,15 @@ echo "# local network mounts" >> $TMPFILE
 for m in doc download music picture video; do echo "freenas.doom.priv:/mnt/mfe/${m} /home/marc/nas/${m} nfs rsize=8192,wsize=8192,timeo=14,intr 0 0" >> $TMPFILE; done;
 sudo -E /bin/sh -c "cat $TMPFILE >> /etc/fstab"
 
+* Configure External Drive
+
+mkdir -p ~/nas/mnt
+export TMPFILE=$(mktemp)
+echo "" >> $TMPFILE
+echo "# local mounts" >> $TMPFILE
+echo "/dev/sda1	/home/marc/mnt ext4 errors=remount-ro 0 0" >> $TMPFILE
+sudo -E /bin/sh -c "cat $TMPFILE >> /etc/fstab"
+
 * Xmodmap
 
 echo "clear Mod4" > ~/.Xmodmap
