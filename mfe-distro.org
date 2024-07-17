@@ -5,16 +5,13 @@ autoconf \
 autotools-dev \
 bison \
 bmap-tools \
-brasero \
 check \
 chrpath \
 cmake \
-devscripts \
 dvdbackup \
 emacs \
-filezilla \
+flameshot \
 flex \
-fonts-terminus \
 gawk \
 gcc \
 git \
@@ -23,7 +20,6 @@ git-lfs \
 gitk \
 global \
 gnuplot-x11 \
-htop \
 i3 \
 jq \
 libelf-dev \
@@ -42,31 +38,20 @@ picocom \
 pkg-config \
 python3-pip \
 rpm2cpio \
-fonts-terminus \
 texinfo \
 texlive-full \
 tree \
 ubuntu-restricted-extras \
 valgrind \
 vlc \
+w3m \
 zlib1g-dev
+
+mkdir -p ~/notes
 
 mkdir -p ~/dev
 cd ~/dev
-git clone https://github.com/mferland/distroconf.git mfedistro
-
-sudo snap install flameshot
-
-* OpenCL
-
-sudo apt install mesa-opencl-icd
-sudo apt install opencl-headers
-sudo apt install ocl-icd-opencl-dev
-
-Mesa and LLVM PPA:
-
-sudo add-apt-repository ppa:paulo-miguel-dias/pkppa
-sudo apt-get update
+git clone https://github.com/mferland/distroconf.git distroconf
 
 * Add to dialout group
 
@@ -86,15 +71,15 @@ mkdir -p ~/.config/i3
 mkdir -p ~/.config/i3status
 mkdir -p ~/.config/i3blocks
 
-cp ~/dev/mfedistro/i3.conf ~/.config/i3/config
-cp ~/dev/mfedistro/i3status.conf ~/.config/i3status/config
-cp ~/dev/mfedistro/i3blocks.conf ~/.config/i3blocks/config
+cp ~/dev/distroconf/i3.conf ~/.config/i3/config
+cp ~/dev/distroconf/i3status.conf ~/.config/i3status/config
+cp ~/dev/distroconf/i3blocks.conf ~/.config/i3blocks/config
 
 * Install fonts
 
 cd ~
 mkdir -p .fonts && cd .fonts
-wget http://upperbounds.net/download/download_bridge.php?get=ProggyClean.ttf.zip -O ProggyClean.ttf.zip
+wget http://www.proggyfonts.net/download/download_bridge.php?get=ProggyClean.ttf.zip -O ProggyClean.ttf.zip
 unzip ProggyClean.ttf.zip
 rm Licence.txt Readme.txt ProggyClean.ttf.zip
 
@@ -102,7 +87,7 @@ rm Licence.txt Readme.txt ProggyClean.ttf.zip
 
 mkdir -p ~/.emacs.d/site-lisp
 mkdir -p ~/.saves
-cp ~/dev/mfedistro/init.el ~/.emacs.d/init.el
+cp ~/dev/distroconf/init.el ~/.emacs.d/init.el
 
 Note: remove ~/.emacs.d/elpa if it exists.
 
@@ -114,20 +99,20 @@ git clone https://github.com/mferland/bb-mode.git ~/.emacs.d/site-lisp/bb-mode
 * Install Emacs Server
 
 mkdir -p ~/.config/systemd/user
-cp ~/dev/mfedistro/emacs.service ~/.config/systemd/user
+cp ~/dev/distroconf/emacs.service ~/.config/systemd/user
 systemctl --user enable emacs
 
 mkdir -p ~/bin
-cp ~/dev/mfedistro/edit ~/bin/edit
+cp ~/dev/distroconf/edit ~/bin/edit
 chmod 755 ~/bin/edit
 echo "export EDITOR=~/bin/edit" >> ~/.bashrc
 
-cp ~/dev/mfedistro/lock ~/bin/lock
+cp ~/dev/distroconf/lock ~/bin/lock
 chmod 755 ~/bin/lock
 
 * Install ssh-agent
 
-cp ~/dev/mfedistro/ssh-agent.service ~/.config/systemd/user
+cp ~/dev/distroconf/ssh-agent.service ~/.config/systemd/user
 systemctl --user enable ssh-agent
 systemctl --user start ssh-agent
 
@@ -145,7 +130,9 @@ echo 'export PATH=${HOME}/.local/bin:${PATH}' >> ~/.bashrc
 
 * Install langtool service
 
-sudo cp ~/dev/mfedistro/langtool.service /etc/systemd/system
+Note: Install docker first.
+
+sudo cp ~/dev/distroconf/langtool.service /etc/systemd/system
 sudo systemctl enable langtool.service
 sudo systemctl start langtool.service
 
@@ -202,12 +189,10 @@ ibus-setup
 
 * VirtualBox
 
-echo "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian hirsute contrib" | sudo tee -a /etc/apt/sources.list
-wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install -y virtualbox-6.1
-sudo apt-get install -y dkms
+wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee -a /etc/apt/sources.list.d/virtualbox.list
+sudo apt update
+sudo apt install virtualbox-7.0
 
 ** Install symlink to ~/mnt
 
@@ -218,11 +203,9 @@ ln -sf /home/marc/mnt/VirtualBox\ VMs/ VirtualBox\ VMs
 
 NOTE: Check the latest version first.
 
-export VBOXVER=6.1.36
+export VBOXVER=7.0.20
 wget https://download.virtualbox.org/virtualbox/${VBOXVER}/Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 sudo VBoxManage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
-sudo usermod -aG vboxusers marc
-rm Oracle_VM_VirtualBox_Extension_Pack-${VBOXVER}.vbox-extpack
 reboot
 
 ** Disable auto capture
@@ -234,17 +217,6 @@ the VirtualBox window.
 - Input
 - Uncheck 'Auto Capture Keyboard'
 
-* Vagrant
-
-wget https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.deb
-sudo dpkg -i vagrant_2.2.10_x86_64.deb
-rm vagrant_2.2.10_x86_64.deb
-
-* Skype
-
-Go to: https://www.skype.com/en/get-skype/
-sudo dpkg -i skypeforlinux-64.deb
-
 * NXP Pins Tool
 
 Go to: https://www.nxp.com/pages/pins-tool-for-i.mx-application-processors:PINS-TOOL-IMX?tab=Design_Tools_Tab
@@ -252,10 +224,10 @@ sudo dpkg -i pins-tool-for-imx-processors-v5-1_amd64.deb
 
 * Spotify
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
-echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
-sudo apt-get update
-sudo apt-get install -y spotify-client
+curl -sS https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+sudo apt update
+sudo apt install spotify-client
 
 * Docker
 
@@ -277,7 +249,7 @@ groups
 * i3status
 
 mkdir -p ~/.config/i3status/
-cp ~/dev/mfedistro/i3status.conf ~/.config/i3status/config
+cp ~/dev/distroconf/i3status.conf ~/.config/i3status/config
 
 * libdvdcss
 
@@ -292,7 +264,7 @@ Terminus TTF Medium
 
 git config --global user.name "Marc Ferland"
 git config --global user.email marc.ferland@gmail.com
-git config --global sendemail.from "ferlandm@amotus.ca"
+git config --global sendemail.from "marc.ferland@gmail.com"
 git config --global sendemail.smtpuser "marc.ferland@gmail.com"
 git config --global sendemail.smtpserver "smtp.googlemail.com"
 git config --global sendemail.smtpencryption tls
@@ -335,3 +307,21 @@ mkdir ~/mnt
 sudo mount /dev/sdb1 ./mnt
 sudo chmod 755 ./mnt
 echo "/dev/sdb1 /home/marc/mnt ext4 rw,exec 0 0" | sudo tee -a /etc/fstab
+
+* Vtune
+
+https://www.intel.com/content/www/us/en/developer/tools/oneapi/vtune-profiler-download.html?operatingsystem=linux&distributions=aptpackagemanager
+
+wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+sudo apt update
+sudo apt install intel-oneapi-vtune
+sudo usermod -a -G vtune marc
+cd /opt/intel/oneapi
+source setvars.sh
+vtune-gui &
+
+* uprof
+
+wget https://www.amd.com/en/developer/uprof/uprof-eula.html?filename=amduprof_4.1-424_amd64.deb
+sudo dpkg --install amduprof_4.1-424_amd64.deb
