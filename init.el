@@ -81,6 +81,16 @@
 (setq auto-mode-alist (cons '("\\.bbappend$" . bb-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.bbclass$" . bb-mode) auto-mode-alist))
 
+(add-to-list 'load-path "~/.emacs.d/site-lisp/flex")
+(require 'flex)
+(add-to-list 'auto-mode-alist '("\\.l$" . flex-mode))
+(autoload 'flex-mode "flex")
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/bison")
+(require 'bison)
+(add-to-list 'auto-mode-alist '("\\.y$" . bison-mode))
+(autoload 'bison-mode "bison")
+
 ;; C++ hook
 (defun my-c++-mode-hook ()
   (setq c-basic-offset 4)
@@ -252,6 +262,20 @@
 (use-package web-mode
   :ensure t)
 
+(use-package company
+  :ensure t)
+
+(use-package rtags-xref
+  :ensure t
+  :init (setq xref-prompt-for-identifier nil))
+(add-hook 'c-mode-common-hook #'rtags-xref-enable)
+
+(use-package company-rtags
+  :ensure t
+  :init
+  (setq rtags-completions-enabled t)
+  (push 'company-rtags company-backends))
+
 (setq browse-url-browser-function #'w3m-browse-url)
 
 (custom-set-variables
@@ -260,7 +284,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(web-mode php-mode markdown-mode langtool kconfig-mode w3m dockerfile-mode systemd cmake-mode yaml-mode powerline expand-region use-package org-roam magit lsp-ui lsp-treemacs helm-lsp helm-dash flycheck dts-mode company)))
+   '(web-mode php-mode markdown-mode langtool kconfig-mode w3m dockerfile-mode systemd cmake-mode yaml-mode powerline expand-region use-package org-roam magit lsp-ui lsp-treemacs helm-lsp helm-dash flycheck dts-mode company))
+ '(reb-re-syntax 'rx))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
