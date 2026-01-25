@@ -1,0 +1,207 @@
+* Basic Setup
+
+- Keyboard Layout: English (US)
+- Username: marc
+- Password: ******
+- Full name: Marc Ferland
+- Email Address: marc.ferland@gmail.com
+- Hostname: mfe-desktop
+- Timezone: America/Montreal
+- Install...
+- Reboot
+
+* Packages to install
+
+sudo pacman -S 7zip \
+astyle \
+autoconf \
+automake \
+base-devel \
+bison \
+cdrkit \
+cdrtools \
+check \
+chrpath \
+cpio \
+diffstat \
+dvdbackup \
+emacs \
+evtest \
+evtest \
+firefox \
+global \
+handbrake \
+libaacs \
+libbluray \
+libdvdcss \
+libtool \
+man-pages \
+nfs-utils \
+nmap \
+picocom \
+pkg-config \
+rpcsvc-proto \
+strace \
+tk \
+tree \
+usbutils \
+uv \
+valgrind \
+w3m \
+wev \
+wget
+
+* QEMU Install
+
+pacman -S virt-manager qemu-desktop dnsmasq
+
+* Add ${HOME}/.local/bin to PATH
+
+echo 'export PATH=${HOME}/.local/bin:${PATH}' >> ~/.bashrc
+
+* rtags
+
+git clone --recursive https://github.com/Andersbakken/rtags.git
+cd rtags
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
+make -j 24
+sudo make install
+
+** Install systemd service
+
+mkdir -p ~/.config/systemd/user
+cp ~/dev/distroconf/rdm.service ~/.config/systemd/user
+cp ~/dev/distroconf/rdm.socket ~/.config/systemd/user
+systemctl --user enable rdm.socket
+systemctl --user start rdm.socket
+
+** Index Kernel sources
+
+Start by compiling the kernel.
+
+./scripts/clang-tools/gen_compile_commands.py
+rc -J .
+
+** Index libzc
+
+sudo apt install bear
+
+Go to libzc source directory:
+bear -- make
+rc -J .
+
+* git
+
+git config --global user.name "Marc Ferland"
+git config --global user.email marc.ferland@gmail.com
+git config --global sendemail.from "marc.ferland@gmail.com"
+git config --global sendemail.smtpuser "marc.ferland@gmail.com"
+git config --global sendemail.smtpserver "smtp.googlemail.com"
+git config --global sendemail.smtpencryption tls
+git config --global sendemail.smtpserverport 587
+
+* Setup Keyboard
+
+sudo cp 70-keyboard.hwdb /etc/udev/hwdb.d/
+sudo chmod 644 /etc/udev/hwdb.d/70-keyboard.hwdb
+sudo chown root:root /etc/udev/hwdb.d/70-keyboard.hwdb
+sudo systemd-hwdb update
+sudo udevadm trigger --verbose --sysname-match='event3'
+sudo udevadm info /dev/input/by-path/*-usb-*-kbd | grep -i keyboard_key
+
+* Install Emacs Packages
+
+mkdir -p ~/.emacs.d/site-lisp
+mkdir -p ~/.saves
+cp ~/dev/distroconf/init.el ~/.emacs.d/init.el
+
+Note: remove ~/.emacs.d/elpa if it exists.
+
+** bb-mode
+
+mkdir -p ~/.emacs.d/site-lisp/bb-mode
+git clone https://github.com/mferland/bb-mode.git ~/.emacs.d/site-lisp/bb-mode
+
+** bison
+
+mkdir -p ~/.emacs.d/site-lisp/bison
+git clone https://github.com/manateelazycat/bison.git ~/.emacs.d/site-lisp/bison
+
+** flex
+
+mkdir -p ~/.emacs.d/site-lisp/flex
+git clone https://github.com/manateelazycat/flex.git ~/.emacs.d/site-lisp/flex
+
+* Configure NFS mounts
+
+mkdir -p ~/nas/doc
+mkdir -p ~/nas/download
+mkdir -p ~/nas/music
+mkdir -p ~/nas/picture
+mkdir -p ~/nas/video
+
+export TMPFILE=$(mktemp)
+echo "" >> $TMPFILE
+echo "# local network mounts" >> $TMPFILE
+for m in doc download music picture video; do echo "freenas.doom.priv:/mnt/mfe/${m} /home/marc/nas/${m} nfs rsize=8192,wsize=8192,timeo=14,intr 0 0" >> $TMPFILE; done;
+sudo -E /bin/sh -c "cat $TMPFILE >> /etc/fstab"
+systemctl daemon-reload
+
+* Install Emacs Server
+
+mkdir -p ~/.config/systemd/user
+cp ~/dev/distroconf/emacs.service ~/.config/systemd/user
+systemctl --user enable emacs
+
+* Install ssh-key
+
+mkdir -p ~/.ssh
+cp ~/nas/doc/backup/ssh/id_rsa ~/.ssh
+cp ~/nas/doc/backup/ssh/id_rsa.pub ~/.ssh
+ssh -T git@github.com
+
+* Install ssh-agent
+
+cp ~/dev/distroconf/ssh-agent.service ~/.config/systemd/user
+systemctl --user enable ssh-agent
+systemctl --user start ssh-agent
+
+echo 'eval $(systemctl --user show-environment | grep SSH_AUTH_SOCK)' >> ~/.bash_profile
+echo 'export SSH_AUTH_SOCK' >> ~/.bash_profile
+
+mkdir -p ~/.ssh
+cat <<EOF > ~/.ssh/config
+AddKeysToAgent yes
+EOF
+
+* Hyperland
+
+** Use US and CA keyboard layouts
+
+sed -i "s/kb_layout\ =.*/kb_layout\ =\ us,ca/g" ~/.config/hypr/input.conf
+
+** Set keyboard options
+
+sed -i "s/kb_options\ =.*/kb_options\ =\ grps:shifts_toggle/g" ~/.config/hypr/input.conf
+
+** Set repeat delay
+
+sed -i "s/repeat_delay\ =.*/repeat_delay\ =\ 300/g" ~/.config/hypr/input.conf
+
+** Configure Monitor (.config/hypr/monitors.conf)
+
+env = GDK_SCALE,1.75
+monitor=,preferred,auto,1.6
+
+** Set environment (.config/uwsm/default)
+
+export EDITOR=emacs
+
+# Use firefox as the default browser
+BROWSER=firefox
+
+* Enable SSH
+
+sudo systemctl enable sshd
+sudo systemctl start sshd
+

@@ -1,0 +1,2 @@
+evdev:input:b0003v0853p0100*
+ KEYBOARD_KEY_7008b=key_leftmeta
