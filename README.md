@@ -12,9 +12,10 @@ git clone git@github.com:mferland/distroconf.git ~/dev/distroconf
 The bootstrap is safe to rerun. Before replacing an unmanaged target, it
 moves that target into a timestamped directory under
 `~/.local/state/distroconf/backups/`. GNU Stow owns the files in `dotfiles/`;
-the existing top-level Emacs, SSH, and helper-script sources are linked
-explicitly to preserve the repository's established layout. The Emacs unit is
-installed as a regular file because `systemctl reenable` removes linked units.
+the existing top-level Emacs, SSH, and helper-script sources are installed or
+linked explicitly to preserve the repository's established layout. The Emacs
+unit is installed as a regular file because `systemctl reenable` removes
+linked units, and the SSH client config is installed with mode `0600`.
 
 It restores:
 
@@ -34,7 +35,9 @@ files.
 
 ## Manual system setup
 
-- [YubiKey 5 NFC](yubikey.org) covers FIDO2/WebAuthn, hardware-backed SSH
-  credentials, and optional PAM and smart-card integration.
+- [SSH](ssh.org) covers client keys, the user agent, Git hosts, YubiKey-backed
+  credentials, backups, and optional client and server settings.
+- [YubiKey 5 NFC](yubikey.org) covers FIDO2/WebAuthn and optional PAM and
+  smart-card integration.
 - [Network mounts](mounts.org) covers location-aware NFS mounts for the home
   NAS and the SAPFS CIFS mount for the work network.

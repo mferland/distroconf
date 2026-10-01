@@ -3,10 +3,12 @@ Description=SSH key agent
 IgnoreOnIsolate=true
 
 [Service]
-Type=forking
+Type=simple
 Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
-ExecStart=/usr/bin/ssh-agent -a $SSH_AUTH_SOCK
-ExecStartPost=/usr/bin/systemctl --user set-environment SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
+ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.socket
+ExecStartPost=/usr/bin/systemctl --user set-environment SSH_AUTH_SOCK=%t/ssh-agent.socket
+ExecStopPost=/usr/bin/systemctl --user unset-environment SSH_AUTH_SOCK
+Restart=on-failure
 
 [Install]
 WantedBy=default.target

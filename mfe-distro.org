@@ -36,7 +36,6 @@ mkisofs \
 ncurses-dev \
 nfs-common \
 nmap \
-openssh-server \
 picocom \
 pkg-config \
 python3-pip \
@@ -132,19 +131,10 @@ echo "export EDITOR=~/bin/edit" >> ~/.bashrc
 cp ~/dev/distroconf/lock ~/bin/lock
 chmod 755 ~/bin/lock
 
-* Install ssh-agent
+* Configure SSH
 
-cp ~/dev/distroconf/ssh-agent.service ~/.config/systemd/user
-systemctl --user enable ssh-agent
-systemctl --user start ssh-agent
-
-echo 'eval $(systemctl --user show-environment | grep SSH_AUTH_SOCK)' >> ~/.bash_profile
-echo 'export SSH_AUTH_SOCK' >> ~/.bash_profile
-
-mkdir -p ~/.ssh
-cat <<EOF > ~/.ssh/config
-AddKeysToAgent yes
-EOF
+See [[file:ssh.org][the SSH setup guide]] for client keys, the user agent, Git
+hosts, and the optional SSH server.
 
 * Add ${HOME}/.local/bin to PATH
 
@@ -344,10 +334,6 @@ gpg --list-keys
 gpg --output mykey_pub.gpg --armor --export KEY
 gpg --output mykey_sec.gpg --armor --export-secret-key KEY
 cp mykey_*.gpg ~/nas/??
-
-** SSH
-
-cp -a ~/.ssh ~/nas/??
 
 * WORK
 

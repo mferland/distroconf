@@ -1,8 +1,8 @@
 [Unit]
 Description=Emacs: the extensible, self-documenting text editor
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
-Wants=ssh-agent.socket
-After=ssh-agent.socket
+Wants=ssh-agent.service
+After=ssh-agent.service
 
 [Service]
 Type=notify

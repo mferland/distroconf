@@ -5,8 +5,8 @@
 - Keep recovery codes and an independent way to sign in to every account.
 - Where a service permits it, register at least two security keys and test both
   before removing an existing authentication method.
-- Do not commit PINs, recovery codes, PAM enrollment data, SSH credential
-  handles, or other key material to this repository.
+- Do not commit PINs, recovery codes, PAM enrollment data, or other key
+  material to this repository.
 - A FIDO reset deletes every FIDO2 and U2F credential on the YubiKey. Do not run
   ~ykman fido reset~ as a troubleshooting step.
 
@@ -55,153 +55,11 @@ removing the previous sign-in method.
 WebAuthn enrollment is service-specific and should not be automated or stored
 in this repository.
 
-* Create a hardware-backed SSH credential
+* Use the YubiKey for SSH
 
-Confirm that the installed OpenSSH supports security-key algorithms:
-
-#+begin_src sh
-ssh -Q key | grep '^sk-'
-#+end_src
-
-Create a resident Ed25519 credential that requires the FIDO2 PIN as well as a
-touch. The command prompts for the YubiKey PIN and for a passphrase protecting
-the local credential-handle file.
-
-#+begin_src sh
-ssh-keygen -t ed25519-sk -O resident -O verify-required \
-  -C "$USER@$(hostname)-yubikey" \
-  -f ~/.ssh/id_ed25519_sk_yubikey
-#+end_src
-
-Some older YubiKey 5 firmware does not support Ed25519 security-key
-credentials. If the key reports that the algorithm is unsupported, use ECDSA:
-
-#+begin_src sh
-ssh-keygen -t ecdsa-sk -O resident -O verify-required \
-  -C "$USER@$(hostname)-yubikey" \
-  -f ~/.ssh/id_ecdsa_sk_yubikey
-#+end_src
-
-The private file created by ~ssh-keygen~ is a credential handle, not the private
-cryptographic key itself; signing still requires the YubiKey. Treat the file as
-sensitive and back it up securely. Copy the corresponding ~.pub~ file to the
-Git host or server, then test it before removing any existing key:
-
-#+begin_src sh
-cat ~/.ssh/id_ed25519_sk_yubikey.pub
-ssh -T git@github.com
-#+end_src
-
-Because the credential is resident, its handles can be recovered on another
-computer. Run this from an empty temporary directory: ~ssh-keygen -K~ writes
-the recovered handle files into the current directory.
-
-#+begin_src sh
-recovery_dir=$(mktemp -d)
-cd "$recovery_dir"
-ssh-keygen -K
-#+end_src
-
-Inspect the generated files, move only the intended credential into ~~/.ssh~,
-and set mode ~600~ on its private handle and ~644~ on its public key.
-
-* Use the same YubiKey on Ubuntu 22.04 at work
-
-If you created the resident SSH credential above, you do not need another SSH
-key just because you use another workstation. Recover its local handle on the
-workstation; the private cryptographic key stays on the YubiKey. Existing
-server registrations for that public key continue to work.
-
-On the Ubuntu workstation, install the SSH client and check its capabilities:
-
-#+begin_src sh
-sudo apt update
-sudo apt install openssh-client
-ssh -V
-ssh -Q key | grep '^sk-'
-#+end_src
-
-Downloading resident credentials requires OpenSSH 8.3 or newer; using
-~verify-required~ requires 8.4 or newer. Connect the YubiKey by USB and use its
-existing FIDO2 PIN. Run recovery in an empty directory to avoid overwriting
-any existing SSH files:
-
-#+begin_src sh
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-recovery_dir=$(mktemp -d)
-cd "$recovery_dir"
-ssh-keygen -K
-ls -l
-#+end_src
-
-Recovery prompts for the PIN and writes handle and public-key files into that
-directory. It can recover several credentials. Inspect the public-key
-fingerprints and select the one matching the public key you registered with
-your Git host or server:
-
-#+begin_src sh
-ssh-keygen -lf ./id_ed25519_sk_rk.pub
-#+end_src
-
-The recovered filename can differ, especially for ECDSA or a custom
-application name. Substitute the actual filenames below. Use a destination
-name that is not already in use; ~-i~ prompts before overwriting:
-
-#+begin_src sh
-mv -i ./id_ed25519_sk_rk ~/.ssh/id_ed25519_sk_yubikey
-mv -i ./id_ed25519_sk_rk.pub ~/.ssh/id_ed25519_sk_yubikey.pub
-chmod 600 ~/.ssh/id_ed25519_sk_yubikey
-chmod 644 ~/.ssh/id_ed25519_sk_yubikey.pub
-ssh-keygen -p -f ~/.ssh/id_ed25519_sk_yubikey
-#+end_src
-
-The final command sets a local passphrase on the recovered handle. Recovery
-does not restore the passphrase used on the other workstation.
-
-Test with an explicit identity; replace the destination with your work Git
-host or SSH server:
-
-#+begin_src sh
-ssh -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519_sk_yubikey -T git@github.com
-#+end_src
-
-For regular use, merge an entry into ~~/.ssh/config~ for the intended host:
-
-#+begin_src conf
-Host github.com
-    IdentityFile ~/.ssh/id_ed25519_sk_yubikey
-    IdentitiesOnly yes
-#+end_src
-
-If the original SSH credential was non-resident, ~ssh-keygen -K~ cannot
-recover it. Securely transfer its existing handle file and public key from
-the original machine, or create a separate credential and register its public
-key with the work service.
-
-** When to create a separate work SSH credential
-
-A separate work credential is useful when work and personal access should be
-revoked independently, or your employer requires a dedicated key. It can
-live on the same YubiKey. Give it a distinct application name so it does not
-replace the existing resident credential:
-
-#+begin_src sh
-ssh-keygen -t ed25519-sk -O resident -O verify-required \
-  -O application=ssh:work \
-  -C "work-yubikey" -f ~/.ssh/id_ed25519_sk_work
-#+end_src
-
-Use a filename and application name that are not already in use. Use
-~ecdsa-sk~ instead if your hardware does not support Ed25519. Register the
-new ~.pub~ file with the work service and configure its host entry to use
-~IdentityFile ~/.ssh/id_ed25519_sk_work~.
-
-Website security-key registrations already on the YubiKey can also be used
-from the work browser by selecting the security-key sign-in option. A new
-work account needs its own enrollment. Local sudo enrollment is separate and
-must be configured on each workstation; the Arch/Omarchy package commands
-and PAM changes below are not Ubuntu workstation setup instructions.
+Hardware-backed SSH key creation, recovery on the work workstation, and
+per-host client configuration are documented in [[file:ssh.org::*Hardware-backed keys with a YubiKey][the SSH setup guide]].
+Website security-key enrollment and local PAM enrollment remain separate.
 
 * Optional: use the key for sudo authentication
 
@@ -288,11 +146,9 @@ world-writable.
 
 * References
 
-- [[https://developers.yubico.com/SSH/Securing_SSH_with_FIDO2.html][Yubico: SSH with FIDO2 and resident-key recovery]]
 - [[https://docs.yubico.com/software/yubikey/tools/ykman/FIDO_Commands.html][Yubico: YubiKey Manager FIDO commands]]
 - [[https://docs.yubico.com/hardware/yubikey/yk-tech-manual/yk5-apps-fido.html][Yubico: FIDO2 and U2F on YubiKey 5]]
 - [[https://developers.yubico.com/pam-u2f/][Yubico: pam-u2f documentation]]
-- [[https://man.openbsd.org/ssh-keygen][OpenSSH: ssh-keygen manual]]
 - [[https://wiki.archlinux.org/title/YubiKey][ArchWiki: YubiKey]]
 - [[https://wiki.archlinux.org/title/Universal_2nd_Factor][ArchWiki: Universal 2nd Factor]]
 

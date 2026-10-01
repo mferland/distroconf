@@ -72,10 +72,11 @@ link_repo_file() {
 }
 
 install_repo_file() {
-  local source=$1 target=$2 resolved
+  local source=$1 target=$2 mode=${3:-0644} resolved
   mkdir -p -- "$(dirname -- "$target")"
 
   if [[ -f "$target" && ! -L "$target" ]] && cmp -s -- "$source" "$target"; then
+    chmod "$mode" "$target"
     return 0
   fi
 
@@ -90,7 +91,7 @@ install_repo_file() {
     backup_target "$target"
   fi
 
-  install -m 0644 -- "$source" "$target"
+  install -m "$mode" -- "$source" "$target"
 }
 
 sync_checkout() {
@@ -158,7 +159,8 @@ stow --restow --no-folding --dir "$repo_dir" --target "$HOME" dotfiles
 sync_omarchy_plugins
 
 link_repo_file "$repo_dir/init.el" "$HOME/.emacs.d/init.el"
-link_repo_file "$repo_dir/ssh.config" "$HOME/.ssh/config"
+install_repo_file "$repo_dir/ssh.config" "$HOME/.ssh/config" 0600
+install_repo_file "$repo_dir/ssh-agent.service" "$HOME/.config/systemd/user/ssh-agent.service"
 install_repo_file "$repo_dir/emacs.service" "$HOME/.config/systemd/user/emacs.service"
 
 mkdir -p -- "$HOME/bin" "$HOME/.saves" "$HOME/.emacs.d/site-lisp"
@@ -175,7 +177,7 @@ emacs -Q --batch -l "$HOME/.emacs.d/init.el"
 
 log "configuring user services"
 systemctl --user daemon-reload
-systemctl --user enable --now ssh-agent.socket
+systemctl --user enable --now ssh-agent.service
 systemctl --user reenable emacs.service
 if ! systemctl --user is-active --quiet emacs.service; then
   systemctl --user start emacs.service

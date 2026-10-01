@@ -161,34 +161,14 @@ mkdir -p ~/.config/systemd/user
 cp ~/dev/distroconf/emacs.service ~/.config/systemd/user
 systemctl --user enable emacs
 
-* Install ssh-key
-
-mkdir -p ~/.ssh
-cp ~/nas/doc/backup/ssh/id_rsa ~/.ssh
-cp ~/nas/doc/backup/ssh/id_rsa.pub ~/.ssh
-ssh -T git@github.com
-
 * Configure YubiKey 5 NFC
 
 See [[file:yubikey.org][the YubiKey 5 NFC setup guide]].
 
-* Install ssh-agent
+* Configure SSH
 
-cp ~/dev/distroconf/ssh-agent.service ~/.config/systemd/user
-systemctl --user enable ssh-agent
-systemctl --user start ssh-agent
-
-echo 'eval $(systemctl --user show-environment | grep SSH_AUTH_SOCK)' >> ~/.bash_profile
-echo 'export SSH_AUTH_SOCK' >> ~/.bash_profile
-
-mkdir -p ~/.ssh
-cat <<EOF > ~/.ssh/config
-AddKeysToAgent yes
-EOF
-
-* Always start sshd
-
-sudo systemctl enable sshd
+See [[file:ssh.org][the SSH setup guide]] for client keys, the user agent, Git
+hosts, and the optional SSH server.
 
 * Hyperland
 
@@ -215,16 +195,6 @@ export EDITOR=emacs
 
 # Use firefox as the default browser
 BROWSER=firefox
-
-* Enable SSH
-
-sudo systemctl enable sshd
-sudo systemctl start sshd
-
-* Configure UFW
-
-sudo ufw allow ssh
-sudo ufw status
 
 * Change Clock Format
 

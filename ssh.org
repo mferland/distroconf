@@ -1,0 +1,495 @@
+#+title: SSH setup
+
+This is the central guide for SSH client keys, the user agent, Git hosts,
+YubiKey-backed credentials, backups, and the optional SSH server.  Private
+keys, credential handles, and =authorized_keys= files are deliberately not
+stored in this repository.
+
+The repository keeps two deployable files beside this guide:
+
+- [[file:ssh.config][ssh.config]] is installed as =~/.ssh/config= by
+  =bootstrap.sh=.
+- [[file:ssh-agent.service][ssh-agent.service]] provides one agent per user
+  session at =$XDG_RUNTIME_DIR/ssh-agent.socket=.
+
+* Install the SSH tools
+
+Ubuntu/Debian client only:
+
+#+begin_src sh
+sudo apt update
+sudo apt install openssh-client
+#+end_src
+
+Arch Linux/Omarchy installs the client and server from one package:
+
+#+begin_src sh
+sudo pacman -S openssh
+#+end_src
+
+Install the Ubuntu server package only if this workstation must accept
+incoming SSH connections:
+
+#+begin_src sh
+sudo apt install openssh-server
+#+end_src
+
+* Configure the client
+
+The normal Omarchy setup is automated:
+
+#+begin_src sh
+~/dev/distroconf/bootstrap.sh
+#+end_src
+
+For a manual installation, create the private directory, review any existing
+config, and then install the tracked file with strict permissions:
+
+#+begin_src sh
+install -d -m 0700 ~/.ssh
+if [[ -e ~/.ssh/config ]]; then
+  printf '%s\n' 'Review and merge the existing ~/.ssh/config'
+else
+  install -m 0600 ~/dev/distroconf/ssh.config ~/.ssh/config
+fi
+#+end_src
+
+This deliberately leaves an existing config untouched so it can be merged by
+hand instead of overwritten.
+
+The tracked client configuration is equivalent to:
+
+#+begin_src conf
+AddKeysToAgent yes
+
+Host github.com gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_sk_yubikey
+    IdentityFile ~/.ssh/id_ed25519
+    IdentityFile ~/.ssh/id_rsa
+    IdentitiesOnly yes
+#+end_src
+
+The identity order prefers the YubiKey, then a software Ed25519 key, and
+keeps RSA as a migration fallback.  Remove the RSA line after confirming that
+every required service accepts one of the newer keys.  =IdentitiesOnly yes=
+prevents unrelated keys loaded in the agent from being offered to these Git
+hosts.
+
+Check the fully expanded configuration without opening a connection:
+
+#+begin_src sh
+ssh -G github.com | less
+#+end_src
+
+* Run one user SSH agent
+
+=bootstrap.sh= installs and enables the tracked service.  To do that manually:
+
+#+begin_src sh
+install -Dm 0644 ~/dev/distroconf/ssh-agent.service \
+  ~/.config/systemd/user/ssh-agent.service
+systemctl --user daemon-reload
+systemctl --user enable --now ssh-agent.service
+#+end_src
+
+The tracked =~/.bash_profile= exports the same socket path for login shells:
+
+#+begin_src sh
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ssh-agent.socket"
+#+end_src
+
+Start a new login shell after changing the profile, then verify the service
+and socket.  An empty new agent reports that it has no identities; that is not
+an error.
+
+#+begin_src sh
+systemctl --user status ssh-agent.service
+test -S "$SSH_AUTH_SOCK"
+ssh-add -l
+#+end_src
+
+Load a software key for the current login session:
+
+#+begin_src sh
+ssh-add ~/.ssh/id_ed25519
+#+end_src
+
+The YubiKey identity can usually be used directly through its local handle;
+it does not have to be preloaded with =ssh-add=.
+
+** Emacs integration
+
+The tracked =emacs.service= orders Emacs after =ssh-agent.service= and exports
+the same socket path.  =init.el= also sets that path when Emacs is launched
+outside the user service.  After changing either unit, reload and restart
+Emacs:
+
+#+begin_src sh
+systemctl --user daemon-reload
+systemctl --user restart emacs.service
+#+end_src
+
+* Create client keys
+
+** Hardware-backed keys with a YubiKey
+
+Confirm that OpenSSH supports security-key algorithms:
+
+#+begin_src sh
+ssh -Q key | grep '^sk-'
+#+end_src
+
+Create a resident Ed25519 credential that requires the FIDO2 PIN and a touch.
+The command prompts for the PIN and for a passphrase protecting the local
+credential-handle file.
+
+#+begin_src sh
+install -d -m 0700 ~/.ssh
+ssh-keygen -t ed25519-sk -O resident -O verify-required \
+  -C "$USER@$(hostname)-yubikey" \
+  -f ~/.ssh/id_ed25519_sk_yubikey
+#+end_src
+
+Some older YubiKey 5 firmware does not support Ed25519 security-key
+credentials.  If the key reports that the algorithm is unsupported, use
+ECDSA instead:
+
+#+begin_src sh
+ssh-keygen -t ecdsa-sk -O resident -O verify-required \
+  -C "$USER@$(hostname)-yubikey" \
+  -f ~/.ssh/id_ecdsa_sk_yubikey
+#+end_src
+
+In that case, replace the =id_ed25519_sk_yubikey= identity path in
+=~/.ssh/config= with =id_ecdsa_sk_yubikey=.
+
+The private file created by =ssh-keygen= is a credential handle, not the
+cryptographic private key; signing still requires the YubiKey.  Treat the
+handle as sensitive and back it up securely.  Inspect its public key and
+fingerprint before registering it with a Git host or server:
+
+#+begin_src sh
+ssh-keygen -lf ~/.ssh/id_ed25519_sk_yubikey.pub
+cat ~/.ssh/id_ed25519_sk_yubikey.pub
+#+end_src
+
+Test a registered GitHub key before removing an older identity:
+
+#+begin_src sh
+ssh -o IdentitiesOnly=yes \
+  -i ~/.ssh/id_ed25519_sk_yubikey -T git@github.com
+#+end_src
+
+** Recover a resident YubiKey key on the work workstation
+
+The cryptographic private key stays on the YubiKey.  OpenSSH 8.3 or newer can
+recover a resident credential handle with =ssh-keygen -K=; the
+=verify-required= option requires OpenSSH 8.4 or newer.
+
+Install the client, connect the YubiKey by USB, and recover into a new empty
+directory so no existing files can be overwritten:
+
+#+begin_src sh
+sudo apt update
+sudo apt install openssh-client
+ssh -V
+ssh -Q key | grep '^sk-'
+
+install -d -m 0700 ~/.ssh
+recovery_dir=$(mktemp -d)
+cd "$recovery_dir"
+ssh-keygen -K
+ls -la
+#+end_src
+
+Recovery can produce several credentials.  Inspect each public-key
+fingerprint and choose the one matching the key registered with the service:
+
+#+begin_src sh
+ssh-keygen -lf ./id_ed25519_sk_rk.pub
+#+end_src
+
+The recovered filename can differ for ECDSA or a custom application name.
+Substitute the actual filenames below.  =mv -i= asks before overwriting an
+existing destination.
+
+#+begin_src sh
+mv -i ./id_ed25519_sk_rk ~/.ssh/id_ed25519_sk_yubikey
+mv -i ./id_ed25519_sk_rk.pub ~/.ssh/id_ed25519_sk_yubikey.pub
+chmod 600 ~/.ssh/id_ed25519_sk_yubikey
+chmod 644 ~/.ssh/id_ed25519_sk_yubikey.pub
+ssh-keygen -p -f ~/.ssh/id_ed25519_sk_yubikey
+#+end_src
+
+The final command sets a local passphrase on the recovered handle.  Recovery
+does not restore the passphrase used on another workstation.  A non-resident
+credential cannot be recovered with =ssh-keygen -K=; securely transfer its
+existing handle or create and register a new key.
+
+** Use a separate work YubiKey identity
+
+A separate work credential is useful when personal and work access must be
+revoked independently or policy requires a dedicated key.  A distinct
+application name allows it to coexist on the same YubiKey:
+
+#+begin_src sh
+ssh-keygen -t ed25519-sk -O resident -O verify-required \
+  -O application=ssh:work \
+  -C "work-yubikey" \
+  -f ~/.ssh/id_ed25519_sk_work
+#+end_src
+
+Use =ecdsa-sk= if the hardware does not support Ed25519.  Register the new
+=.pub= file with the work service and reference
+=~/.ssh/id_ed25519_sk_work= only from work-specific host entries.
+
+** Software fallback key
+
+Use a passphrase-protected Ed25519 key when a hardware-backed credential is
+not practical:
+
+#+begin_src sh
+install -d -m 0700 ~/.ssh
+ssh-keygen -t ed25519 -a 100 \
+  -C "$USER@$(hostname)" \
+  -f ~/.ssh/id_ed25519
+#+end_src
+
+Do not generate a new RSA key for routine use.  Keep an existing RSA key only
+where a legacy target still requires it, and plan its replacement.
+
+* Register and test a key
+
+For a server that temporarily permits password login, install a public key:
+
+#+begin_src sh
+ssh-copy-id -i ~/.ssh/id_ed25519.pub marc@SERVER_NAME
+#+end_src
+
+Test public-key authentication in a second terminal before changing server
+authentication settings:
+
+#+begin_src sh
+ssh -o PreferredAuthentications=publickey \
+  -o PasswordAuthentication=no marc@SERVER_NAME
+#+end_src
+
+Git hosting services do not support =ssh-copy-id=.  Paste the intended =.pub=
+file into the account's SSH-key settings, verify its displayed fingerprint,
+and test it:
+
+#+begin_src sh
+ssh -T git@github.com
+ssh -T git@gitlab.com
+#+end_src
+
+GitHub and GitLab normally report that shell access is unavailable even when
+authentication succeeds.
+
+* Back up and restore SSH material
+
+Do not copy the whole =~/.ssh= directory unencrypted to the NAS.  It may
+contain private keys, credential handles, host inventory, and authorization
+files.  Store private material only in an encrypted backup with restricted
+access.  Public keys and the tracked client config are safe to reproduce from
+their original services and this repository.
+
+After restoring a specific key, correct its permissions and verify its
+fingerprint before use:
+
+#+begin_src sh
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+ssh-keygen -lf ~/.ssh/id_ed25519.pub
+#+end_src
+
+Use the corresponding filenames for a YubiKey handle or legacy key.  Never
+overwrite an existing key merely because its filename matches.
+
+* Optional configurations worth considering
+
+These are proposals, not part of the default tracked client configuration.
+Add only the snippets that match the target environment.
+
+** Separate personal and work Git identities
+
+Host aliases make the selected identity explicit when both accounts use the
+same Git provider:
+
+#+begin_src conf
+Host github-personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_sk_yubikey
+    IdentitiesOnly yes
+
+Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_sk_work
+    IdentitiesOnly yes
+#+end_src
+
+Select an account by using its alias in the repository remote:
+
+#+begin_src sh
+git remote set-url origin git@github-work:WORK_ORG/REPOSITORY.git
+#+end_src
+
+** Keep VPN or Wi-Fi sessions from hanging indefinitely
+
+Apply keepalives only to the relevant work domain.  This example closes a
+connection after roughly ninety seconds without a server response:
+
+#+begin_src conf
+Host *.sonatest.net
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+#+end_src
+
+** Reuse authenticated connections
+
+Connection multiplexing makes repeated Git or shell connections faster.  A
+master connection remains usable for ten minutes after the last client exits,
+so do not enable this on a shared account or where every connection must
+reauthenticate.
+
+#+begin_src sh
+install -d -m 0700 ~/.ssh/control
+#+end_src
+
+#+begin_src conf
+Host *.sonatest.net
+    ControlMaster auto
+    ControlPersist 10m
+    ControlPath ~/.ssh/control/%C
+#+end_src
+
+** Connect through a bastion
+
+=ProxyJump= replaces hand-built nested SSH commands when internal hosts are
+reachable only through a gateway:
+
+#+begin_src conf
+Host work-bastion
+    HostName BASTION_NAME
+    User marc
+    IdentityFile ~/.ssh/id_ed25519_sk_work
+    IdentitiesOnly yes
+
+Host *.internal.sonatest.net
+    User marc
+    ProxyJump work-bastion
+    IdentityFile ~/.ssh/id_ed25519_sk_work
+    IdentitiesOnly yes
+#+end_src
+
+Do not enable =ForwardAgent= for this arrangement; =ProxyJump= does not need
+to expose the local agent to the bastion.
+
+** Limit how long a software key stays in the agent
+
+Load a key with an eight-hour lifetime instead of retaining it until logout:
+
+#+begin_src sh
+ssh-add -t 8h ~/.ssh/id_ed25519
+#+end_src
+
+* Optional SSH server
+
+Do not enable the server unless incoming access is required.  First install a
+public key and prove that it works.  Keep the current session open while
+testing changes from a second terminal.
+
+Create a drop-in rather than editing the distribution file directly:
+
+#+begin_src sh
+sudoedit /etc/ssh/sshd_config.d/20-distroconf.conf
+#+end_src
+
+Paste this configuration into the editor:
+
+#+begin_src conf
+# /etc/ssh/sshd_config.d/20-distroconf.conf
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+AllowUsers marc
+#+end_src
+
+Validate before reloading:
+
+#+begin_src sh
+sudo sshd -t
+#+end_src
+
+On Arch Linux/Omarchy:
+
+#+begin_src sh
+sudo systemctl enable --now sshd.service
+sudo systemctl reload sshd.service
+#+end_src
+
+On Ubuntu/Debian:
+
+#+begin_src sh
+sudo systemctl enable --now ssh.service
+sudo systemctl reload ssh.service
+#+end_src
+
+If a firewall is active, prefer a source-restricted rule over exposing SSH to
+every network.  Replace the example subnet with the actual trusted LAN:
+
+#+begin_src sh
+sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
+sudo ufw status verbose
+#+end_src
+
+Do not disable password authentication until public-key login succeeds in a
+second session.  Settings such as =AllowTcpForwarding no= or
+=X11Forwarding no= can further reduce server capability, but they also break
+legitimate tunnels, remote development tools, and graphical forwarding; add
+them only after checking actual use.
+
+* Troubleshooting
+
+Inspect the selected identity and expanded options first:
+
+#+begin_src sh
+ssh -G HOST_NAME | grep -E '^(user|hostname|identityfile|identitiesonly|proxyjump) '
+ssh-add -l
+#+end_src
+
+Use verbose mode for one connection.  It prints key paths and fingerprints,
+so review output before sharing it:
+
+#+begin_src sh
+ssh -vvv HOST_NAME
+#+end_src
+
+For agent problems:
+
+#+begin_src sh
+printf '%s\n' "$SSH_AUTH_SOCK"
+test -S "$SSH_AUTH_SOCK"
+systemctl --user status ssh-agent.service
+journalctl --user -u ssh-agent.service --no-pager -n 100
+#+end_src
+
+Never solve a host-key mismatch by disabling strict checking or blindly
+deleting the old key.  Confirm the new fingerprint through an independent,
+trusted channel before updating =known_hosts=.
+
+* References
+
+- [[https://man.openbsd.org/ssh][OpenSSH: ssh client manual]]
+- [[https://man.openbsd.org/ssh_config][OpenSSH: client configuration manual]]
+- [[https://man.openbsd.org/sshd_config][OpenSSH: server configuration manual]]
+- [[https://man.openbsd.org/ssh-keygen][OpenSSH: ssh-keygen manual]]
+- [[https://developers.yubico.com/SSH/Securing_SSH_with_FIDO2.html][Yubico: SSH with FIDO2 and resident-key recovery]]
+
+The client and agent steps were reviewed with OpenSSH 8.9 on Ubuntu 22.04;
+the documented options are also available in current Arch Linux OpenSSH.
