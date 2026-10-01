@@ -1,0 +1,109 @@
+#+title: Network mounts
+
+This file contains the machine-level configuration for network filesystems.
+The SAP CIFS share is reachable only on the work network, while the NAS NFS
+exports are reachable only on the home network.
+
+The entries below use systemd automounts.  Boot does not wait for either
+server.  A share is mounted when its directory is first accessed and is
+unmounted after five minutes without use.  Accessing a share from the wrong
+network can still pause until the ten-second mount timeout expires.
+
+* Install filesystem helpers
+
+Ubuntu/Debian:
+
+#+begin_src sh
+sudo apt install cifs-utils nfs-common
+#+end_src
+
+Arch Linux/Omarchy:
+
+#+begin_src sh
+sudo pacman -S cifs-utils nfs-utils
+#+end_src
+
+* Create mountpoints
+
+#+begin_src sh
+mkdir -p ~/sapfs/folders
+mkdir -p ~/nas/{doc,download,music,picture,video}
+#+end_src
+
+* Work: SAPFS over CIFS
+
+Store the SAP credentials outside this repository in
+=/etc/samba/credentials-sapfs=.  Its contents are:
+
+#+begin_example
+username=marc.ferland
+password=REPLACE_WITH_PASSWORD
+domain=sonatest
+#+end_example
+
+Only root should be able to read the file:
+
+#+begin_src sh
+sudo chown root:root /etc/samba/credentials-sapfs
+sudo chmod 0600 /etc/samba/credentials-sapfs
+#+end_src
+
+Add this line to =/etc/fstab=:
+
+#+begin_example
+//sapfs.sonatest.net/folders /home/marc/sapfs/folders cifs credentials=/etc/samba/credentials-sapfs,uid=1000,gid=1000,file_mode=0755,dir_mode=0755,vers=3.1.1,rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+#+end_example
+
+The credential file supplies the username, password, and domain.  The
+=uid=/= and =gid=/= options make files appear owned by the local user.  Do not
+copy the negotiated options shown by =mount= back into =fstab=; options such
+as =addr=, =rsize=, and =wsize= are selected by the CIFS client at mount time.
+
+* Home: NAS over NFS
+
+Add these lines to =/etc/fstab=:
+
+#+begin_example
+freenas.doom.priv:/mnt/mfe/doc      /home/marc/nas/doc      nfs rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+freenas.doom.priv:/mnt/mfe/download /home/marc/nas/download nfs rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+freenas.doom.priv:/mnt/mfe/music    /home/marc/nas/music    nfs rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+freenas.doom.priv:/mnt/mfe/picture  /home/marc/nas/picture  nfs rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+freenas.doom.priv:/mnt/mfe/video    /home/marc/nas/video    nfs rw,_netdev,nofail,x-systemd.automount,x-systemd.idle-timeout=5min,x-systemd.mount-timeout=10s 0 0
+#+end_example
+
+The client and server negotiate transfer sizes.  The old =rsize=8192= and
+=wsize=8192= overrides are intentionally omitted.
+
+* Apply and verify
+
+Check =/etc/fstab= before reloading systemd:
+
+#+begin_src sh
+sudo findmnt --verify
+sudo systemctl daemon-reload
+#+end_src
+
+Access a directory while connected to the corresponding network to trigger
+its mount, then inspect it:
+
+#+begin_src sh
+ls ~/sapfs/folders
+findmnt --target ~/sapfs/folders
+
+ls ~/nas/doc
+findmnt --target ~/nas/doc
+#+end_src
+
+To retry after a failed attempt, stop the relevant automount and mount units,
+reload systemd, and access the directory again.  For example:
+
+#+begin_src sh
+sudo systemctl stop home-marc-sapfs-folders.mount home-marc-sapfs-folders.automount
+sudo systemctl daemon-reload
+sudo systemctl start home-marc-sapfs-folders.automount
+ls ~/sapfs/folders
+#+end_src
+
+The NFS unit names follow the same path-to-unit conversion; for example,
+=~/nas/doc= becomes =home-marc-nas-doc.mount= and
+=home-marc-nas-doc.automount=.

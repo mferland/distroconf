@@ -32,7 +32,9 @@ credentials, and machine-specific system configuration are deliberately not
 tracked. Privileged or hardware-specific setup remains documented in the Org
 files.
 
-## Manual security setup
+## Manual system setup
 
 - [YubiKey 5 NFC](yubikey.org) covers FIDO2/WebAuthn, hardware-backed SSH
   credentials, and optional PAM and smart-card integration.
+- [Network mounts](mounts.org) covers location-aware NFS mounts for the home
+  NAS and the SAPFS CIFS mount for the work network.

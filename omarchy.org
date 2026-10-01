@@ -12,7 +12,8 @@ The bootstrap installs the package manifests, backs up conflicting files,
 links the files under =dotfiles/= with GNU Stow, installs the Emacs and
 systemd-user configuration, restores the Omarchy theme/font/background, and
 reloads the desktop configuration.  Machine-specific and privileged tasks
-such as keyboard firmware rules and NFS mounts remain documented below.
+such as keyboard firmware rules remain documented separately.  See
+[[file:mounts.org][Network mounts]] for the NFS and CIFS setup.
 
 * Basic Setup
 
@@ -153,21 +154,6 @@ git clone https://github.com/manateelazycat/bison.git ~/.emacs.d/site-lisp/bison
 
 mkdir -p ~/.emacs.d/site-lisp/flex
 git clone https://github.com/manateelazycat/flex.git ~/.emacs.d/site-lisp/flex
-
-* Configure NFS mounts
-
-mkdir -p ~/nas/doc
-mkdir -p ~/nas/download
-mkdir -p ~/nas/music
-mkdir -p ~/nas/picture
-mkdir -p ~/nas/video
-
-export TMPFILE=$(mktemp)
-echo "" >> $TMPFILE
-echo "# local network mounts" >> $TMPFILE
-for m in doc download music picture video; do echo "freenas.doom.priv:/mnt/mfe/${m} /home/marc/nas/${m} nfs rsize=8192,wsize=8192,timeo=14,intr 0 0" >> $TMPFILE; done;
-sudo -E /bin/sh -c "cat $TMPFILE >> /etc/fstab"
-systemctl daemon-reload
 
 * Install Emacs Server
 
