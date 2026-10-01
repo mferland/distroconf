@@ -277,6 +277,9 @@ prompt."
 (use-package kconfig-mode
   :ensure t)
 
+(use-package qml-mode
+  :ensure t)
+
 (use-package langtool
   :ensure t
   :init
