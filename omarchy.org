@@ -1,3 +1,19 @@
+* Automated setup
+
+The portable, user-owned parts of this setup are now captured by this
+repository.  On a new Omarchy installation:
+
+#+begin_src sh
+git clone git@github.com:mferland/distroconf.git ~/dev/distroconf
+~/dev/distroconf/bootstrap.sh
+#+end_src
+
+The bootstrap installs the package manifests, backs up conflicting files,
+links the files under =dotfiles/= with GNU Stow, installs the Emacs and
+systemd-user configuration, restores the Omarchy theme/font/background, and
+reloads the desktop configuration.  Machine-specific and privileged tasks
+such as keyboard firmware rules and NFS mounts remain documented below.
+
 * Basic Setup
 
 - Keyboard Layout: English (US)
@@ -23,12 +39,16 @@ cdrtools \
 check \
 chrpath \
 cpio \
+cmake \
 diffstat \
+dnsmasq \
+dmidecode \
 dvdbackup \
 emacs \
 evtest \
 evtest \
 firefox \
+freerdp \
 global \
 handbrake \
 libaacs \
@@ -36,10 +56,12 @@ libbluray \
 libdvdcss \
 libtool \
 man-pages \
+nano \
 nfs-utils \
 nmap \
 picocom \
 pkg-config \
+remmina \
 rpcsvc-proto \
 strace \
 tk \
@@ -160,6 +182,10 @@ cp ~/nas/doc/backup/ssh/id_rsa ~/.ssh
 cp ~/nas/doc/backup/ssh/id_rsa.pub ~/.ssh
 ssh -T git@github.com
 
+* Configure YubiKey 5 NFC
+
+See [[file:yubikey.org][the YubiKey 5 NFC setup guide]].
+
 * Install ssh-agent
 
 cp ~/dev/distroconf/ssh-agent.service ~/.config/systemd/user
@@ -174,6 +200,10 @@ cat <<EOF > ~/.ssh/config
 AddKeysToAgent yes
 EOF
 
+* Always start sshd
+
+sudo systemctl enable sshd
+
 * Hyperland
 
 ** Use US and CA keyboard layouts
@@ -182,11 +212,11 @@ sed -i "s/kb_layout\ =.*/kb_layout\ =\ us,ca/g" ~/.config/hypr/input.conf
 
 ** Set keyboard options
 
-sed -i "s/kb_options\ =.*/kb_options\ =\ grps:shifts_toggle/g" ~/.config/hypr/input.conf
+sed -i "s/kb_options\ =.*/kb_options\ =\ grp:shifts_toggle/g" ~/.config/hypr/input.conf
 
 ** Set repeat delay
 
-sed -i "s/repeat_delay\ =.*/repeat_delay\ =\ 300/g" ~/.config/hypr/input.conf
+sed -i "s/repeat_delay\ =.*/repeat_delay\ =\ 400/g" ~/.config/hypr/input.conf
 
 ** Configure Monitor (.config/hypr/monitors.conf)
 
@@ -205,3 +235,98 @@ BROWSER=firefox
 sudo systemctl enable sshd
 sudo systemctl start sshd
 
+* Configure UFW
+
+sudo ufw allow ssh
+sudo ufw status
+
+* Change Clock Format
+
+jq '.clock = {
+    "format": "{:L%A %d %B %Y W%U %T %Z  }",
+    "interval": 1,
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select",
+    "timezones": ["", "Europe/London"],
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "on-click-right": "mode",
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions": {
+      "on-scroll-up": "tz_up",
+      "on-scroll-down": "tz_down"
+    }
+  }' < ~/.config/waybar/config.jsonc > /tmp/config.jsonc
+
+mv /tmp/config.jsonc ~/.config/waybar/config.jsonc
+
+To test waybar:
+
+pkill waybar && waybar &
+
+* Running virt-manager as normal user
+
+** Add myself to libvirt group
+
+sudo usermod -aG libvirt marc
+
+** Change /etc/libvirt/qemu.conf user and group settings
+
+TODO: Really needed if I am in the libvirt group?
+
+sudo sed -i "s/^user\ =\ .*/user\ =\ \"marc\"/g" /etc/libvirt/qemu.conf
+sudo sed -i "s/^group\ =\ .*/group\ =\ \"marc\"/g" /etc/libvirt/qemu.conf
+reboot
+
+** Enable libvirtd.socket
+
+sudo systemctl enable libvirtd.socket
+systemctl status libvirtd.socket
+reboot
+
+** Configure QEMU User session
+
+Open virt-manager
+
+File --> Add Connection
+Select QEMU/KVM User User Session
+Click OK
+
+** Creating a new VM
+
+1- Open virt-manager
+2- Select QEMU/KVM User Session
+3- Right click -> New
+4- Choose "QEMU/KVM User session" connection
+5- At step 5: make sure to select "Usermode networking"
+
+TODO: Really needed to autostart the bridge?
+Right click on "QEMU/KVM User Session" from virt-manager
+Open "Virtual Network" tab
+
+** Listing networks
+
+sudo virsh net-list --all
+sudo virsh net-start default
+sudo virsh net-list --all
+sudo virsh net-autostart default
+
+* kas
+
+Starting kas-container:
+    kas-container --docker-args "--device /dev/net/tun:/dev/net/tun --cap-add=NET_ADMIN"  shell kas-qemu-test.yml
+
+Starting qemu:
+    runqemu nographic
+
+See: https://www.marcusfolkesson.se/blog/kas-container-and-qemu/

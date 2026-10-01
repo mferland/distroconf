@@ -1,0 +1,6 @@
+.DS_Store
+*~
+*.bak
+*.elc
+/.stow-local-ignore
+

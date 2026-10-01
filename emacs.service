@@ -1,13 +1,15 @@
 [Unit]
 Description=Emacs: the extensible, self-documenting text editor
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+Wants=ssh-agent.socket
+After=ssh-agent.socket
 
 [Service]
-Type=forking
-ExecStart=/usr/bin/emacs --daemon
-ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
-Environment=SSH_AUTH_SOCK=%t/keyring/ssh
-Restart=no
+Type=notify
+ExecStart=/usr/bin/emacs --fg-daemon
+SuccessExitStatus=15
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+Restart=on-failure
 
 # Remove the limit in startup timeout, since emacs
 # cloning and building all packages can take time

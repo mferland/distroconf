@@ -1,0 +1,5 @@
+# Explicitly installed foreign/AUR packages on the source machine.
+bridge-utils
+libbdplus
+snapd
+

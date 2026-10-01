@@ -1,3 +1,5 @@
+;;; init.el --- Personal Emacs configuration -*- lexical-binding: t; -*-
+
 ;; Look & feel
 (setq inhibit-startup-screen t)
 ;; (set-default-font "DejaVu Sans Mono-9")
@@ -31,9 +33,17 @@
 ;; dired listing using human readable sizes
 (setq dired-listing-switches "-alh")
 
-(setenv "SSH_AUTH_SOCK" (concat (getenv "HOME") "/.ssh-auth-sock"))
+(let ((runtime-dir (getenv "XDG_RUNTIME_DIR")))
+  (when runtime-dir
+    (setenv "SSH_AUTH_SOCK"
+            (expand-file-name "ssh-agent.socket" runtime-dir))))
 
 (require 'package)
+(require 'bookmark)
+(require 'warnings)
+
+;; These legacy modes have not adopted lexical binding upstream yet.
+(add-to-list 'warning-suppress-log-types '(files missing-lexbind-cookie))
 
 ;; Add MELPA to package-archives.
 (add-to-list 'package-archives
@@ -59,7 +69,7 @@
 (require 'use-package)
 
 ;; Theme
-(load-theme 'tango-dark t)
+(load-theme 'catppuccin t)
 
 ;; Global hl
 (global-hl-line-mode 1)
@@ -169,17 +179,17 @@
   "Take screenshot from clipboard, copy it to the same directory
   as the org-buffer and insert a link to this file."
   (interactive)
-  (setq filename
-	(concat
-	 (make-temp-name
-	  (concat (buffer-file-name)
-		  "_"
-		  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
-  (message "Saving screenshot to: %s" filename)
-  ;; (call-process "xclip" nil  "-selection" "clipboard" "-t" "image/png -o" filename)
-  (shell-command-to-string (concat "/usr/bin/xclip -selection clipboard -t image/png -o > " filename))
-  (insert (concat "[[" filename "]]"))
-  (org-display-inline-images))
+  (let ((filename
+	 (concat
+	  (make-temp-name
+	   (concat (buffer-file-name)
+		   "_"
+		   (format-time-string "%Y%m%d_%H%M%S_"))) ".png")))
+    (message "Saving screenshot to: %s" filename)
+    ;; (call-process "xclip" nil "-selection" "clipboard" "-t" "image/png -o" filename)
+    (shell-command-to-string (concat "/usr/bin/xclip -selection clipboard -t image/png -o > " filename))
+    (insert (concat "[[" filename "]]"))
+    (org-display-inline-images)))
 
 (use-package org-roam
   :ensure t
@@ -196,6 +206,26 @@
   :config
   (org-roam-setup))
 
+(defun mfe/helm-git-grep ()
+  "Search the entire current Git worktree with Helm."
+  (interactive)
+  ;; A non-nil prefix argument makes `helm-grep-do-git-grep' search from
+  ;; the repository root instead of restricting itself to `default-directory'.
+  (helm-grep-do-git-grep t))
+
+(defun mfe/helm-find-from-git-root (arg)
+  "Find files by name from the current Git root.
+Outside a Git repository, search from `default-directory' as `helm-find'
+normally does.  With prefix argument ARG, preserve `helm-find's directory
+prompt."
+  (interactive "P")
+  (if arg
+      (helm-find arg)
+    (require 'vc)
+    (require 'helm-find)
+    (helm-find-1 (or (vc-find-root default-directory ".git")
+                     default-directory))))
+
 (use-package helm
   :ensure t
   :init
@@ -206,6 +236,7 @@
   (setq helm-ff-file-name-history-use-recentf t)
   (global-unset-key (kbd "C-x c"))
   :bind (("C-c h"   . helm-command-prefix)
+         ("C-c g"   . mfe/helm-git-grep)
          ("M-x"     . helm-M-x)
          ("C-x b"   . helm-mini)
          ("C-x C-f" . helm-find-files)
@@ -214,6 +245,7 @@
          ("C-i"   . helm-execute-persistent-action)
          ("C-z"   . helm-select-action))
   :config
+  (define-key helm-command-map (kbd "/") #'mfe/helm-find-from-git-root)
   (helm-mode 1))
 
 (use-package dts-mode
@@ -265,6 +297,9 @@
 (use-package company
   :ensure t)
 
+(use-package catppuccin-theme
+  :ensure t)
+
 (use-package rtags-xref
   :ensure t
   :init (setq xref-prompt-for-identifier nil))
@@ -283,8 +318,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(web-mode php-mode markdown-mode langtool kconfig-mode w3m dockerfile-mode systemd cmake-mode yaml-mode powerline expand-region use-package org-roam magit lsp-ui lsp-treemacs helm-lsp helm-dash flycheck dts-mode company))
+ '(package-selected-packages nil)
  '(reb-re-syntax 'rx))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
