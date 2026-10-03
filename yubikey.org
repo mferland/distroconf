@@ -61,6 +61,114 @@ Hardware-backed SSH key creation, recovery on the work workstation, and
 per-host client configuration are documented in [[file:ssh.org::*Hardware-backed keys with a YubiKey][the SSH setup guide]].
 Website security-key enrollment and local PAM enrollment remain separate.
 
+* Use an SSH agent and reuse connections
+
+Use this setup on either workstation after creating or recovering the SSH
+credential. The agent holds its local handle and caches the handle's file
+passphrase. It does not cache permission to bypass the YubiKey's PIN and touch
+requirements. Multiplexing reduces touches by reusing an already authenticated
+connection for the same remote user, host, and port.
+
+** Load the credential into the agent
+
+Use the agent provided by your desktop session. Check it from a terminal:
+
+#+begin_src sh
+ssh-add -l
+#+end_src
+
+"The agent has no identities" means an agent is available but empty. If the
+command instead reports that it cannot connect to an authentication agent,
+start one for the current terminal and its child processes:
+
+#+begin_src sh
+eval "$(ssh-agent -s)"
+#+end_src
+
+This fallback is for the current terminal; do not run it in every terminal's
+shell startup file. Other terminals should use the desktop session's agent.
+Load the handle once per agent session, substituting your work credential's
+filename if you created a separate one:
+
+#+begin_src sh
+ssh-add ~/.ssh/id_ed25519_sk_yubikey
+ssh-add -l
+#+end_src
+
+** Configure a one-hour idle timeout
+
+Create a private directory for the connection control sockets:
+
+#+begin_src sh
+mkdir -p ~/.ssh/control
+chmod 700 ~/.ssh/control
+#+end_src
+
+Merge the following into ~~/.ssh/config~ for each intended work host. Replace
+~github.com~ with your actual host or SSH alias, and adjust ~IdentityFile~ if
+needed. Put this entry before general ~Host *~ defaults, since SSH uses the
+first value found for most settings:
+
+#+begin_src conf
+Host github.com
+    IdentityFile ~/.ssh/id_ed25519_sk_yubikey
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    ForwardAgent no
+    ControlMaster auto
+    ControlPath ~/.ssh/control/%C
+    ControlPersist 1h
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+#+end_src
+
+The first connection authenticates with the YubiKey. Further SSH, Git, SCP,
+and SFTP operations using the same connection reuse that authentication.
+~ControlPersist 1h~ closes the master after one hour with no attached sessions;
+it is an idle timeout, not a maximum connection age. Regular use can keep it
+available throughout the day. Keepalives help detect a broken connection but
+do not prevent server timeouts or network/VPN interruptions.
+
+Expect another PIN verification and touch when connecting to a different
+destination, after the idle timeout, or after the connection is lost. This
+setup reduces repeated touches; it cannot guarantee one touch for the entire
+day. With ~verify-required~, your agent must support prompting for user
+verification. If it cannot sign, use a compatible OpenSSH agent with a working
+askpass prompt, or use ~IdentityAgent none~ for that host to authenticate
+directly; multiplexing still provides connection reuse.
+
+** Check reuse and close a connection
+
+Inspect the effective settings without making a network connection:
+
+#+begin_src sh
+ssh -G github.com | grep -E '^(identityfile|identitiesonly|addkeystoagent|forwardagent|controlmaster|controlpath|controlpersist|serveraliveinterval|serveralivecountmax) '
+#+end_src
+
+Connect, then check the master and connect again:
+
+#+begin_src sh
+ssh -T git@github.com
+ssh -O check git@github.com
+ssh -T git@github.com
+#+end_src
+
+For GitHub, successful authentication reports that shell access is unavailable
+and exits with status 1. The second connection should reuse the master without
+another touch. For other hosts, substitute the actual user and host throughout.
+
+Unplugging the YubiKey or removing its handle from the agent does not close an
+authenticated connection. It remains usable until it disconnects or reaches
+the idle timeout. To close it explicitly when leaving work:
+
+#+begin_src sh
+ssh -O exit git@github.com
+#+end_src
+
+This also disconnects any shells, tunnels, or transfers using that master.
+Repeat for each destination you used. The next connection requires fresh
+authentication. There is no device-removal watcher in this setup.
+
 * Optional: use the key for sudo authentication
 
 This is optional and can lock out administrative access if configured
@@ -146,6 +254,9 @@ world-writable.
 
 * References
 
+- [[https://man.openbsd.org/ssh_config][OpenSSH: agent and multiplexing configuration]]
+- [[https://man.openbsd.org/ssh][OpenSSH: master connection control]]
+- [[https://developers.yubico.com/SSH/Securing_SSH_with_FIDO2.html][Yubico: SSH with FIDO2 and resident-key recovery]]
 - [[https://docs.yubico.com/software/yubikey/tools/ykman/FIDO_Commands.html][Yubico: YubiKey Manager FIDO commands]]
 - [[https://docs.yubico.com/hardware/yubikey/yk-tech-manual/yk5-apps-fido.html][Yubico: FIDO2 and U2F on YubiKey 5]]
 - [[https://developers.yubico.com/pam-u2f/][Yubico: pam-u2f documentation]]
