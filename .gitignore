@@ -4,3 +4,5 @@
 *.elc
 /.stow-local-ignore
 
+__pycache__/
+*.pyc

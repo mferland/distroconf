@@ -69,7 +69,11 @@
 (require 'use-package)
 
 ;; Theme
-(load-theme 'catppuccin t)
+(use-package catppuccin-theme
+  :ensure t
+  :demand t
+  :config
+  (load-theme 'catppuccin t))
 
 ;; Global hl
 (global-hl-line-mode 1)
@@ -300,9 +304,6 @@ prompt."
 (use-package company
   :ensure t)
 
-(use-package catppuccin-theme
-  :ensure t)
-
 (use-package rtags-xref
   :ensure t
   :init (setq xref-prompt-for-identifier nil))
@@ -321,6 +322,9 @@ prompt."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("c4df9006b9eb32599d758800a32f3487c2cdf13826084511783b47d419024af2"
+     default))
  '(package-selected-packages nil)
  '(reb-re-syntax 'rx))
 (custom-set-faces
