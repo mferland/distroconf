@@ -12,10 +12,9 @@ git clone git@github.com:mferland/distroconf.git ~/dev/distroconf
 The bootstrap is safe to rerun. Before replacing an unmanaged target, it
 moves that target into a timestamped directory under
 `~/.local/state/distroconf/backups/`. GNU Stow owns the files in `dotfiles/`;
-the existing top-level Emacs, SSH, and helper-script sources are installed or
-linked explicitly to preserve the repository's established layout. The Emacs
-unit is installed as a regular file because `systemctl reenable` removes
-linked units, and the SSH client config is installed with mode `0600`.
+the Emacs configuration and launcher are linked explicitly; the SSH client
+configuration is installed with mode `0600`. The Emacs unit is
+installed as a regular file because `systemctl reenable` removes linked units.
 
 It restores:
 
@@ -26,12 +25,12 @@ It restores:
 - Git and shell configuration;
 - Emacs configuration and local modes;
 - SSH-agent integration and the Emacs user service;
-- personal scripts in `~/bin`.
+- the `edit` Emacs launcher in `~/bin`.
 
 Generated Omarchy theme files, caches, private keys, browser data, Wi-Fi
 credentials, and machine-specific system configuration are deliberately not
 tracked. Privileged or hardware-specific setup remains documented in the Org
-files.
+files; [omarchy.org](omarchy.org) documents the optional workstation setup.
 
 ## Manual system setup
 

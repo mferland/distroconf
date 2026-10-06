@@ -160,13 +160,20 @@ sync_omarchy_plugins
 
 link_repo_file "$repo_dir/init.el" "$HOME/.emacs.d/init.el"
 install_repo_file "$repo_dir/ssh.config" "$HOME/.ssh/config" 0600
-install_repo_file "$repo_dir/ssh-agent.service" "$HOME/.config/systemd/user/ssh-agent.service"
 install_repo_file "$repo_dir/emacs.service" "$HOME/.config/systemd/user/emacs.service"
 
 mkdir -p -- "$HOME/bin" "$HOME/.saves" "$HOME/.emacs.d/site-lisp"
-for script in audio edit godocker gokas lock make.cross repo ssb sshamotus.sh weather; do
-  link_repo_file "$repo_dir/$script" "$HOME/bin/$script"
+# Remove dangling launchers owned by an earlier checkout of this repository.
+for target in "$HOME/bin/"*; do
+  if [[ -L "$target" && ! -e "$target" ]]; then
+    source=$(readlink -- "$target")
+    if [[ "$source" == "$repo_dir/"* ]]; then
+      unlink -- "$target"
+      log "removed obsolete launcher $target"
+    fi
+  fi
 done
+link_repo_file "$repo_dir/edit" "$HOME/bin/edit"
 
 sync_checkout bb-mode https://github.com/mferland/bb-mode.git
 sync_checkout flex https://github.com/manateelazycat/flex.git
@@ -177,7 +184,7 @@ emacs -Q --batch -l "$HOME/.emacs.d/init.el"
 
 log "configuring user services"
 systemctl --user daemon-reload
-systemctl --user enable --now ssh-agent.service
+systemctl --user enable --now ssh-agent.socket
 systemctl --user reenable emacs.service
 if ! systemctl --user is-active --quiet emacs.service; then
   systemctl --user start emacs.service

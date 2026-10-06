@@ -58,9 +58,7 @@ def managed_paths():
              for p in (REPO / "dotfiles").rglob("*") if p.is_file()]
     pairs += [(REPO / "init.el", HOME / ".emacs.d/init.el"),
               (REPO / "ssh.config", HOME / ".ssh/config")]
-    for name in ["audio", "edit", "godocker", "gokas", "lock", "make.cross", "repo", "ssb",
-                 "sshamotus.sh", "weather"]:
-        pairs.append((REPO / name, HOME / "bin" / name))
+    pairs.append((REPO / "edit", HOME / "bin/edit"))
     return pairs
 
 
@@ -87,7 +85,15 @@ def checks():
         if not condition:
             failures.append(name)
     for source, target in managed_paths():
-        check(f"link {target}", target.is_symlink() and target.resolve() == source.resolve())
+        if source == REPO / "ssh.config":
+            check("SSH config installed privately", target.is_file() and not target.is_symlink()
+                  and target.read_bytes() == source.read_bytes()
+                  and target.stat().st_mode & 0o777 == 0o600)
+        else:
+            check(f"link {target}", target.is_symlink() and target.resolve() == source.resolve())
+    for target in (HOME / "bin").iterdir():
+        if target.is_symlink() and target.resolve().is_relative_to(REPO):
+            check(f"repository launcher {target} resolves", target.exists())
     service = HOME / ".config/systemd/user/emacs.service"
     check("Emacs unit installed as regular file", service.is_file() and not service.is_symlink()
           and service.read_bytes() == (REPO / "emacs.service").read_bytes())

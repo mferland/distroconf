@@ -5,12 +5,13 @@ YubiKey-backed credentials, backups, and the optional SSH server.  Private
 keys, credential handles, and =authorized_keys= files are deliberately not
 stored in this repository.
 
-The repository keeps two deployable files beside this guide:
+The repository keeps the deployable client configuration beside this guide:
 
 - [[file:ssh.config][ssh.config]] is installed as =~/.ssh/config= by
   =bootstrap.sh=.
-- [[file:ssh-agent.service][ssh-agent.service]] provides one agent per user
-  session at =$XDG_RUNTIME_DIR/ssh-agent.socket=.
+
+Omarchy provides the native =ssh-agent.socket= unit at
+=$XDG_RUNTIME_DIR/ssh-agent.socket=; no custom agent unit is installed.
 
 * Install the SSH tools
 
@@ -84,13 +85,10 @@ ssh -G github.com | less
 
 * Run one user SSH agent
 
-=bootstrap.sh= installs and enables the tracked service.  To do that manually:
+=bootstrap.sh= enables Omarchy's native socket. To do that manually:
 
 #+begin_src sh
-install -Dm 0644 ~/dev/distroconf/ssh-agent.service \
-  ~/.config/systemd/user/ssh-agent.service
-systemctl --user daemon-reload
-systemctl --user enable --now ssh-agent.service
+systemctl --user enable --now ssh-agent.socket
 #+end_src
 
 The tracked =~/.bash_profile= exports the same socket path for login shells:
@@ -104,7 +102,7 @@ and socket.  An empty new agent reports that it has no identities; that is not
 an error.
 
 #+begin_src sh
-systemctl --user status ssh-agent.service
+systemctl --user status ssh-agent.socket
 test -S "$SSH_AUTH_SOCK"
 ssh-add -l
 #+end_src
@@ -352,7 +350,7 @@ Host *.sonatest.net
 ** Reuse authenticated connections
 
 Connection multiplexing makes repeated Git or shell connections faster.  A
-master connection remains usable for ten minutes after the last client exits,
+master connection remains usable for one hour after the last client exits,
 so do not enable this on a shared account or where every connection must
 reauthenticate.
 
@@ -363,9 +361,12 @@ install -d -m 0700 ~/.ssh/control
 #+begin_src conf
 Host *.sonatest.net
     ControlMaster auto
-    ControlPersist 10m
+    ControlPersist 1h
     ControlPath ~/.ssh/control/%C
 #+end_src
+
+For YubiKey touch behavior, connection checks, and explicit disconnection, see
+[[file:yubikey.org::*Use an SSH agent and reuse connections][the YubiKey connection reuse instructions]].
 
 ** Connect through a bastion
 
@@ -475,7 +476,7 @@ For agent problems:
 #+begin_src sh
 printf '%s\n' "$SSH_AUTH_SOCK"
 test -S "$SSH_AUTH_SOCK"
-systemctl --user status ssh-agent.service
+systemctl --user status ssh-agent.socket
 journalctl --user -u ssh-agent.service --no-pager -n 100
 #+end_src
 

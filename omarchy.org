@@ -1,288 +1,84 @@
-* Automated setup
+#+title: Omarchy workstation setup
 
-The portable, user-owned parts of this setup are now captured by this
-repository.  On a new Omarchy installation:
+* Restore the managed configuration
+
+Install Omarchy from its official ISO, then follow [[file:README.md][the restore guide]]:
 
 #+begin_src sh
 git clone git@github.com:mferland/distroconf.git ~/dev/distroconf
 ~/dev/distroconf/bootstrap.sh
 #+end_src
 
-The bootstrap installs the package manifests, backs up conflicting files,
-links the files under =dotfiles/= with GNU Stow, installs the Emacs and
-systemd-user configuration, restores the Omarchy theme/font/background, and
-reloads the desktop configuration.  Machine-specific and privileged tasks
-such as keyboard firmware rules remain documented separately.  See
-[[file:mounts.org][Network mounts]] for the NFS and CIFS setup.
+The bootstrap installs the package manifests and pinned shell plugins,
+backs up conflicting files, links the managed dotfiles, installs the Emacs
+user service, and restores the theme, font, and background. Hyprland input
+and appearance use the Lua files under =dotfiles/.config/hypr/=. The shell
+layout and clock format live under =dotfiles/.config/omarchy/=.
 
-* Basic Setup
+SSH uses Omarchy's native =ssh-agent.socket=. The managed Bash profile and
+Emacs unit select its socket; no custom SSH-agent service is needed.
 
-- Keyboard Layout: English (US)
-- Username: marc
-- Password: ******
-- Full name: Marc Ferland
-- Email Address: marc.ferland@gmail.com
-- Hostname: mfe-desktop
-- Timezone: America/Montreal
-- Install...
-- Reboot
+Use [[file:README.md][the VM testing workflow]] before applying configuration changes to a workstation.
+For YubiKey enrollment and SSH connection reuse, see [[file:yubikey.org][the YubiKey guide]].
 
-* Packages to install
+The sections below are optional machine-specific tasks. Bootstrap does not
+apply them automatically.
 
-sudo pacman -S 7zip \
-astyle \
-autoconf \
-automake \
-base-devel \
-bison \
-cdrkit \
-cdrtools \
-check \
-chrpath \
-cpio \
-cmake \
-diffstat \
-dnsmasq \
-dmidecode \
-dvdbackup \
-emacs \
-evtest \
-evtest \
-firefox \
-freerdp \
-global \
-handbrake \
-libaacs \
-libbluray \
-libdvdcss \
-libtool \
-man-pages \
-nano \
-nfs-utils \
-nmap \
-picocom \
-pkg-config \
-remmina \
-rpcsvc-proto \
-strace \
-tk \
-tree \
-usbutils \
-uv \
-valgrind \
-w3m \
-wev \
-wget
+* Keyboard firmware mapping
 
-* QEMU Install
+=70-keyboard.hwdb= maps a key on the matching USB keyboard to Left Meta.
+Install it only on a workstation using that keyboard:
 
-pacman -S virt-manager qemu-desktop dnsmasq
+#+begin_src sh
+sudo install -m 0644 ~/dev/distroconf/70-keyboard.hwdb /etc/udev/hwdb.d/70-keyboard.hwdb
+sudo systemd-hwdb update
+#+end_src
 
-* Add ${HOME}/.local/bin to PATH
+Reconnect the keyboard to apply the rule. The general US/Canadian layout and
+Shift-key layout switching are already managed by =input.lua=.
 
-echo 'export PATH=${HOME}/.local/bin:${PATH}' >> ~/.bashrc
+* Optional RTags integration
 
-* rtags
+The Emacs configuration includes RTags support. If you use it, install the
+RTags tools separately and verify that =/usr/local/bin/rdm= exists before
+installing these units:
 
-git clone --recursive https://github.com/Andersbakken/rtags.git
-cd rtags
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
-make -j 24
-sudo make install
-
-** Install systemd service
-
+#+begin_src sh
 mkdir -p ~/.config/systemd/user
-cp ~/dev/distroconf/rdm.service ~/.config/systemd/user
-cp ~/dev/distroconf/rdm.socket ~/.config/systemd/user
-systemctl --user enable rdm.socket
-systemctl --user start rdm.socket
+install -m 0644 ~/dev/distroconf/rdm.service ~/.config/systemd/user/rdm.service
+install -m 0644 ~/dev/distroconf/rdm.socket ~/.config/systemd/user/rdm.socket
+systemctl --user daemon-reload
+systemctl --user enable --now rdm.socket
+#+end_src
 
-** Index Kernel sources
+For kernel sources, generate a compilation database after configuring and
+building the kernel, then index it:
 
-Start by compiling the kernel.
-
+#+begin_src sh
 ./scripts/clang-tools/gen_compile_commands.py
 rc -J .
+#+end_src
 
-** Index libzc
+* Optional LanguageTool integration
 
-sudo apt install bear
+Emacs is configured to contact LanguageTool on =localhost:8010=. If you use
+this integration, install Docker through Omarchy and verify its service is
+running before installing the container unit:
 
-Go to libzc source directory:
-bear -- make
-rc -J .
+#+begin_src sh
+omarchy install docker
+sudo install -m 0644 ~/dev/distroconf/langtool.service /etc/systemd/system/langtool.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now langtool.service
+#+end_src
 
-* git
+The service pulls the LanguageTool image on its first start.
 
-git config --global user.name "Marc Ferland"
-git config --global user.email marc.ferland@gmail.com
-git config --global sendemail.from "marc.ferland@gmail.com"
-git config --global sendemail.smtpuser "marc.ferland@gmail.com"
-git config --global sendemail.smtpserver "smtp.googlemail.com"
-git config --global sendemail.smtpencryption tls
-git config --global sendemail.smtpserverport 587
+* Optional network mounts
 
-* Setup Keyboard
+See [[file:mounts.org][the network mounts guide]] for location-aware NFS and CIFS setup.
 
-sudo cp 70-keyboard.hwdb /etc/udev/hwdb.d/
-sudo chmod 644 /etc/udev/hwdb.d/70-keyboard.hwdb
-sudo chown root:root /etc/udev/hwdb.d/70-keyboard.hwdb
-sudo systemd-hwdb update
-sudo udevadm trigger --verbose --sysname-match='event3'
-sudo udevadm info /dev/input/by-path/*-usb-*-kbd | grep -i keyboard_key
-
-* Install Emacs Packages
-
-mkdir -p ~/.emacs.d/site-lisp
-mkdir -p ~/.saves
-cp ~/dev/distroconf/init.el ~/.emacs.d/init.el
-
-Note: remove ~/.emacs.d/elpa if it exists.
-
-** bb-mode
-
-mkdir -p ~/.emacs.d/site-lisp/bb-mode
-git clone https://github.com/mferland/bb-mode.git ~/.emacs.d/site-lisp/bb-mode
-
-** bison
-
-mkdir -p ~/.emacs.d/site-lisp/bison
-git clone https://github.com/manateelazycat/bison.git ~/.emacs.d/site-lisp/bison
-
-** flex
-
-mkdir -p ~/.emacs.d/site-lisp/flex
-git clone https://github.com/manateelazycat/flex.git ~/.emacs.d/site-lisp/flex
-
-* Install Emacs Server
-
-mkdir -p ~/.config/systemd/user
-cp ~/dev/distroconf/emacs.service ~/.config/systemd/user
-systemctl --user enable emacs
-
-* Configure YubiKey 5 NFC
-
-See [[file:yubikey.org][the YubiKey 5 NFC setup guide]].
-
-* Configure SSH
-
-See [[file:ssh.org][the SSH setup guide]] for client keys, the user agent, Git
-hosts, and the optional SSH server.
-
-* Hyperland
-
-** Use US and CA keyboard layouts
-
-sed -i "s/kb_layout\ =.*/kb_layout\ =\ us,ca/g" ~/.config/hypr/input.conf
-
-** Set keyboard options
-
-sed -i "s/kb_options\ =.*/kb_options\ =\ grp:shifts_toggle/g" ~/.config/hypr/input.conf
-
-** Set repeat delay
-
-sed -i "s/repeat_delay\ =.*/repeat_delay\ =\ 400/g" ~/.config/hypr/input.conf
-
-** Configure Monitor (.config/hypr/monitors.conf)
-
-env = GDK_SCALE,1.75
-monitor=,preferred,auto,1.6
-
-** Set environment (.config/uwsm/default)
-
-export EDITOR=emacs
-
-# Use firefox as the default browser
-BROWSER=firefox
-
-* Change Clock Format
-
-jq '.clock = {
-    "format": "{:L%A %d %B %Y W%U %T %Z  }",
-    "interval": 1,
-    "tooltip-format": "<tt><small>{calendar}</small></tt>",
-    "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select",
-    "timezones": ["", "Europe/London"],
-    "calendar": {
-      "mode": "year",
-      "mode-mon-col": 3,
-      "weeks-pos": "right",
-      "on-scroll": 1,
-      "on-click-right": "mode",
-      "format": {
-        "months": "<span color='#ffead3'><b>{}</b></span>",
-        "days": "<span color='#ecc6d9'><b>{}</b></span>",
-        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
-        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
-        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
-      }
-    },
-    "actions": {
-      "on-scroll-up": "tz_up",
-      "on-scroll-down": "tz_down"
-    }
-  }' < ~/.config/waybar/config.jsonc > /tmp/config.jsonc
-
-mv /tmp/config.jsonc ~/.config/waybar/config.jsonc
-
-To test waybar:
-
-pkill waybar && waybar &
-
-* Running virt-manager as normal user
-
-** Add myself to libvirt group
-
-sudo usermod -aG libvirt marc
-
-** Change /etc/libvirt/qemu.conf user and group settings
-
-TODO: Really needed if I am in the libvirt group?
-
-sudo sed -i "s/^user\ =\ .*/user\ =\ \"marc\"/g" /etc/libvirt/qemu.conf
-sudo sed -i "s/^group\ =\ .*/group\ =\ \"marc\"/g" /etc/libvirt/qemu.conf
-reboot
-
-** Enable libvirtd.socket
-
-sudo systemctl enable libvirtd.socket
-systemctl status libvirtd.socket
-reboot
-
-** Configure QEMU User session
-
-Open virt-manager
-
-File --> Add Connection
-Select QEMU/KVM User User Session
-Click OK
-
-** Creating a new VM
-
-1- Open virt-manager
-2- Select QEMU/KVM User Session
-3- Right click -> New
-4- Choose "QEMU/KVM User session" connection
-5- At step 5: make sure to select "Usermode networking"
-
-TODO: Really needed to autostart the bridge?
-Right click on "QEMU/KVM User Session" from virt-manager
-Open "Virtual Network" tab
-
-** Listing networks
-
-sudo virsh net-list --all
-sudo virsh net-start default
-sudo virsh net-list --all
-sudo virsh net-autostart default
-
-* kas
-
-Starting kas-container:
-    kas-container --docker-args "--device /dev/net/tun:/dev/net/tun --cap-add=NET_ADMIN"  shell kas-qemu-test.yml
-
-Starting qemu:
-    runqemu nographic
-
-See: https://www.marcusfolkesson.se/blog/kas-container-and-qemu/
+=nfs-utils= is included in the package manifest. Configure workstation-specific
+mounts separately in =/etc/fstab= or systemd mount units, using the correct
+server, exported paths, and local mount points. These mappings are not portable
+between workstations and are not managed by bootstrap.
