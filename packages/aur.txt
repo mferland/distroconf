@@ -2,4 +2,4 @@
 bridge-utils
 libbdplus
 snapd
-
+teams-for-linux
