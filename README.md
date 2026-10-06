@@ -34,6 +34,8 @@ files; [omarchy.org](omarchy.org) documents the optional workstation setup.
 
 ## Manual system setup
 
+- [Rootless kas builds with Podman](omarchy.org#yocto-builds-with-kas-and-rootless-podman)
+  covers selecting Podman and using a writable Yocto repository.
 - [SSH](ssh.org) covers client keys, the user agent, Git hosts, YubiKey-backed
   credentials, backups, and optional client and server settings.
 - [YubiKey 5 NFC](yubikey.org) covers FIDO2/WebAuthn and optional PAM and

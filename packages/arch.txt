@@ -26,6 +26,7 @@ libtool
 man-pages
 nano
 nfs-utils
+podman
 qemu-desktop
 remmina
 rpcsvc-proto
@@ -38,4 +39,3 @@ virt-manager
 w3m
 wev
 wget
-
