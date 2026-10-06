@@ -24,6 +24,64 @@ For YubiKey enrollment and SSH connection reuse, see [[file:yubikey.org][the Yub
 The sections below are optional machine-specific tasks. Bootstrap does not
 apply them automatically.
 
+* RAM-sized disk swap
+
+Omarchy already configures compressed zram to match RAM, with priority 100.
+For additional disk-backed swap, use [[file:setup-swap.sh][setup-swap.sh]]. It follows the
+=/swap= Btrfs subvolume layout used by Omarchy's hibernation setup, without
+changing boot parameters or enabling hibernation. Disk swap has priority 0,
+so the kernel prefers zram first.
+
+The script reads =MemTotal= from =/proc/meminfo= and rounds up to a whole GiB
+to account for memory reserved by hardware: this workstation selects 32 GiB;
+the default test VM selects 8 GiB. This estimates installed RAM from memory
+available to Linux. Reserve that much free disk space plus at least 1 GiB.
+The swapfile consumes real disk space; zram uses RAM as pages are compressed.
+
+#+begin_src sh
+cd ~/dev/distroconf
+./setup-swap.sh                 # Read-only preview on a fresh installation
+sudo ./setup-swap.sh --apply
+swapon --show
+free -h
+#+end_src
+
+On reruns, use =sudo ./setup-swap.sh= to preview an existing protected swapfile.
+The script requires a Btrfs root filesystem and uses =btrfs filesystem mkswapfile=
+to allocate =/swap/swapfile= with the required no-copy-on-write layout. Its
+separate subvolume keeps active swap out of root subvolume snapshots. It
+validates the file with =btrfs inspect-internal map-swapfile=, restricts its
+permissions to 0600, activates it immediately, and adds exactly one entry to
+=/etc/fstab=. Before changing fstab, it saves a timestamped backup alongside it.
+
+Rerunning reuses a valid existing file at least as large as Linux's reported
+RAM, including an unrounded file created by Omarchy's hibernation setup. It
+refuses smaller files, conflicting fstab entries, symlinked paths, or an
+existing file active at another priority; it does not resize or deactivate
+swap automatically. If RAM changes, rerun the preview and review any reported
+size mismatch. This task is optional and is not run by =bootstrap.sh=.
+
+To test the privileged changes in isolation:
+
+#+begin_src sh
+./vm-test.sh apply
+./vm-test.sh ssh
+# Inside the guest:
+cd ~/dev/distroconf
+sudo ./setup-swap.sh --apply
+sudo ./setup-swap.sh --apply     # Verify reruns
+swapon --show                   # zram priority 100, disk swap priority 0
+sudo reboot
+#+end_src
+
+Reconnect with =./vm-test.sh ssh= and confirm =swapon --show= still lists both
+swap devices. A fresh =./vm-test.sh test= starts from the baseline, so repeat
+this optional setup there when testing swap changes.
+
+References: [[https://github.com/omacom/omarchy/blob/quattro/default/systemd/zram-generator.conf.d/90-omarchy.conf][Omarchy zram defaults]],
+[[https://github.com/omacom/omarchy/blob/quattro/bin/omarchy-hibernation-setup][Omarchy hibernation setup]], and
+[[https://btrfs.readthedocs.io/en/latest/Swapfile.html][Btrfs swapfile requirements]].
+
 * Keyboard firmware mapping
 
 =70-keyboard.hwdb= maps a key on the matching USB keyboard to Left Meta.

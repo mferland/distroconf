@@ -41,6 +41,19 @@ files; [omarchy.org](omarchy.org) documents the optional workstation setup.
 - [Network mounts](mounts.org) covers location-aware NFS mounts for the home
   NAS and the SAPFS CIFS mount for the work network.
 
+## RAM-sized disk swap
+
+Omarchy already provides RAM-sized compressed zram. To add the same amount
+of swap on disk, follow [the swap instructions](omarchy.org#ram-sized-disk-swap):
+
+```sh
+./setup-swap.sh                 # Preview
+sudo ./setup-swap.sh --apply    # Create, activate, and enable at boot
+```
+
+This optional Btrfs setup keeps zram preferred and does not enable hibernation.
+It is separate from bootstrap. Test it inside the VM before using it on a workstation.
+
 ## Test configuration changes in an Omarchy VM
 
 `vm-test.sh` installs a dedicated Omarchy guest and preserves a clean baseline.
