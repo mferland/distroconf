@@ -23,18 +23,3 @@ building the kernel, then index it:
 ./scripts/clang-tools/gen_compile_commands.py
 rc -J .
 #+end_src
-
-* Optional LanguageTool integration
-
-Emacs is configured to contact LanguageTool on =localhost:8010=. If you use
-this integration, install Docker through Omarchy and verify its service is
-running before installing the container unit:
-
-#+begin_src sh
-omarchy install docker
-sudo install -m 0644 ~/dev/distroconf/langtool.service /etc/systemd/system/langtool.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now langtool.service
-#+end_src
-
-The service pulls the LanguageTool image on its first start.

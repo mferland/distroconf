@@ -30,7 +30,7 @@ guides. Bootstrap does not apply those tasks automatically.
 
 - [[file:swap.org][RAM-sized disk swap]]: create and persist additional Btrfs swap.
 - [[file:hardware.org][Hardware setup]]: keyboard firmware mapping.
-- [[file:emacs.org][Emacs integrations]]: optional RTags and LanguageTool setup.
+- [[file:emacs.org][Emacs integrations]]: optional RTags setup.
 - [[file:mounts.org][Network mounts]]: location-aware NFS and CIFS setup.
 
 * Development and testing

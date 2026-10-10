@@ -284,12 +284,6 @@ prompt."
 (use-package qml-mode
   :ensure t)
 
-(use-package langtool
-  :ensure t
-  :init
-  (setq langtool-http-server-host "localhost")
-  (setq langtool-http-server-port 8010))
-
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)

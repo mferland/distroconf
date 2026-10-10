@@ -50,5 +50,5 @@ files; [omarchy.org](omarchy.org) documents the optional workstation setup.
 ### Development and testing
 
 - [kas and Podman](kas.org): rootless Yocto builds with writable repositories.
-- [Emacs integrations](emacs.org): optional RTags and LanguageTool setup.
+- [Emacs integrations](emacs.org): optional RTags setup.
 - [VM testing](vm.org): installation, iteration, diagnostics, and acceptance checks.
