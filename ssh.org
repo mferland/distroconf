@@ -1,5 +1,7 @@
 #+title: SSH setup
 
+[[file:README.md][Back to the manual index]]
+
 This is the central guide for SSH client keys, the user agent, Git hosts,
 YubiKey-backed credentials, backups, and the optional SSH server.  Private
 keys, credential handles, and =authorized_keys= files are deliberately not

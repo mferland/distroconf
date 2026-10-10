@@ -1,5 +1,7 @@
 #+title: Omarchy workstation setup
 
+[[file:README.md][Back to the manual index]]
+
 * Restore the managed configuration
 
 Install Omarchy from its official ISO, then follow [[file:README.md][the restore guide]]:
@@ -18,195 +20,20 @@ layout and clock format live under =dotfiles/.config/omarchy/=.
 SSH uses Omarchy's native =ssh-agent.socket=. The managed Bash profile and
 Emacs unit select its socket; no custom SSH-agent service is needed.
 
-Use [[file:README.md][the VM testing workflow]] before applying configuration changes to a workstation.
+Use [[file:vm.org][the VM testing workflow]] before applying configuration changes to a workstation.
 For YubiKey enrollment and SSH connection reuse, see [[file:yubikey.org][the YubiKey guide]].
 
-The sections below are optional machine-specific tasks. Bootstrap does not
-apply them automatically.
+Optional privileged and machine-specific tasks are documented in separate
+guides. Bootstrap does not apply those tasks automatically.
 
-* Yocto builds with kas and rootless Podman
+* Optional workstation tasks
 
-=podman= is included in the official package manifest and installed by
-=bootstrap.sh=. To install it on an existing workstation:
+- [[file:swap.org][RAM-sized disk swap]]: create and persist additional Btrfs swap.
+- [[file:hardware.org][Hardware setup]]: keyboard firmware mapping.
+- [[file:emacs.org][Emacs integrations]]: optional RTags and LanguageTool setup.
+- [[file:mounts.org][Network mounts]]: location-aware NFS and CIFS setup.
 
-#+begin_src sh
-omarchy pkg add podman
-#+end_src
+* Development and testing
 
-Kas recommends Podman for rootless operation. For Yocto/OpenEmbedded builds,
-=kas-container= uses =--userns=keep-id= to preserve your user identity on
-mounted files, allowing a writable source repository. Run it as your normal
-user, without =sudo=; no Docker daemon or Podman API socket is needed.
-
-** Select Podman instead of Docker
-
-If both engines are installed, kas normally prefers Docker. Select Podman
-in the current terminal:
-
-#+begin_src sh
-export KAS_CONTAINER_ENGINE=podman
-#+end_src
-
-To retain this preference in future Bash terminals, add that export line
-once to =~/.bashrc=, then open a new terminal or source the file. The managed
-=~/.bash_profile= also sources =~/.bashrc=. Docker can remain installed for
-other applications; Docker contexts and =DOCKER_HOST= do not select the kas
-engine when =KAS_CONTAINER_ENGINE=podman= is set.
-
-** Verify rootless setup and run kas
-
-Podman requires subordinate UID/GID ranges for your user in =/etc/subuid=
-and =/etc/subgid=, plus =newuidmap= and =newgidmap=. This workstation already
-has those prerequisites. Check them on a new installation before building:
-
-#+begin_src sh
-command -v newuidmap newgidmap
-awk -F: -v user="$USER" '$1 == user' /etc/subuid /etc/subgid
-podman info --format '{{.Host.Security.Rootless}}'  # Expected: true
-#+end_src
-
-From the directory containing your project's kas configuration:
-
-#+begin_src sh
-BB_NUMBER_THREADS=1 kas-container shell kas-kde-release-test.yml
-kas-container --repo-rw build kas-kde-release-test.yml
-#+end_src
-
-=shell= mounts the repository writable by default. =build= defaults to
-read-only, so specify =--repo-rw= when build-time access must also be writable.
-There is no requirement to pass =--repo-ro= with Podman for these Yocto builds.
-
-If migrating from rootless Docker, existing workspace files may have
-incompatible ownership. Preserve the old workspace and select a fresh one:
-
-#+begin_src sh
-export KAS_WORK_DIR="$HOME/kas-work/kde-podman"
-mkdir -p "$KAS_WORK_DIR"
-kas-container shell kas-kde-release-test.yml
-#+end_src
-
-Use a new directory for this example if that path already contains files
-from Docker. An external workspace is optional with Podman; =KAS_WORK_DIR=
-otherwise defaults to the current directory. Podman has separate image and
-container storage, so the first invocation downloads the kas image again.
-
-References: [[https://kas.readthedocs.io/en/latest/userguide/kas-container.html][kas container guide]],
-[[https://github.com/siemens/kas/blob/5.4/kas-container][kas 5.4 user namespace and mount handling]], and
-[[https://docs.podman.io/en/latest/markdown/podman.1.html][Podman rootless prerequisites]].
-
-* RAM-sized disk swap
-
-Omarchy already configures compressed zram to match RAM, with priority 100.
-For additional disk-backed swap, use [[file:setup-swap.sh][setup-swap.sh]]. It follows the
-=/swap= Btrfs subvolume layout used by Omarchy's hibernation setup, without
-changing boot parameters or enabling hibernation. Disk swap has priority 0,
-so the kernel prefers zram first.
-
-The script reads =MemTotal= from =/proc/meminfo= and rounds up to a whole GiB
-to account for memory reserved by hardware: this workstation selects 32 GiB;
-the default test VM selects 8 GiB. This estimates installed RAM from memory
-available to Linux. Reserve that much free disk space plus at least 1 GiB.
-The swapfile consumes real disk space; zram uses RAM as pages are compressed.
-
-#+begin_src sh
-cd ~/dev/distroconf
-./setup-swap.sh                 # Read-only preview on a fresh installation
-sudo ./setup-swap.sh --apply
-swapon --show
-free -h
-#+end_src
-
-On reruns, use =sudo ./setup-swap.sh= to preview an existing protected swapfile.
-The script requires a Btrfs root filesystem and uses =btrfs filesystem mkswapfile=
-to allocate =/swap/swapfile= with the required no-copy-on-write layout. Its
-separate subvolume keeps active swap out of root subvolume snapshots. It
-validates the file with =btrfs inspect-internal map-swapfile=, restricts its
-permissions to 0600, activates it immediately, and adds exactly one entry to
-=/etc/fstab=. Before changing fstab, it saves a timestamped backup alongside it.
-
-Rerunning reuses a valid existing file at least as large as Linux's reported
-RAM, including an unrounded file created by Omarchy's hibernation setup. It
-refuses smaller files, conflicting fstab entries, symlinked paths, or an
-existing file active at another priority; it does not resize or deactivate
-swap automatically. If RAM changes, rerun the preview and review any reported
-size mismatch. This task is optional and is not run by =bootstrap.sh=.
-
-To test the privileged changes in isolation:
-
-#+begin_src sh
-./vm-test.sh apply
-./vm-test.sh ssh
-# Inside the guest:
-cd ~/dev/distroconf
-sudo ./setup-swap.sh --apply
-sudo ./setup-swap.sh --apply     # Verify reruns
-swapon --show                   # zram priority 100, disk swap priority 0
-sudo reboot
-#+end_src
-
-Reconnect with =./vm-test.sh ssh= and confirm =swapon --show= still lists both
-swap devices. A fresh =./vm-test.sh test= starts from the baseline, so repeat
-this optional setup there when testing swap changes.
-
-References: [[https://github.com/omacom/omarchy/blob/quattro/default/systemd/zram-generator.conf.d/90-omarchy.conf][Omarchy zram defaults]],
-[[https://github.com/omacom/omarchy/blob/quattro/bin/omarchy-hibernation-setup][Omarchy hibernation setup]], and
-[[https://btrfs.readthedocs.io/en/latest/Swapfile.html][Btrfs swapfile requirements]].
-
-* Keyboard firmware mapping
-
-=70-keyboard.hwdb= maps a key on the matching USB keyboard to Left Meta.
-Install it only on a workstation using that keyboard:
-
-#+begin_src sh
-sudo install -m 0644 ~/dev/distroconf/70-keyboard.hwdb /etc/udev/hwdb.d/70-keyboard.hwdb
-sudo systemd-hwdb update
-#+end_src
-
-Reconnect the keyboard to apply the rule. The general US/Canadian layout and
-Shift-key layout switching are already managed by =input.lua=.
-
-* Optional RTags integration
-
-The Emacs configuration includes RTags support. If you use it, install the
-RTags tools separately and verify that =/usr/local/bin/rdm= exists before
-installing these units:
-
-#+begin_src sh
-mkdir -p ~/.config/systemd/user
-install -m 0644 ~/dev/distroconf/rdm.service ~/.config/systemd/user/rdm.service
-install -m 0644 ~/dev/distroconf/rdm.socket ~/.config/systemd/user/rdm.socket
-systemctl --user daemon-reload
-systemctl --user enable --now rdm.socket
-#+end_src
-
-For kernel sources, generate a compilation database after configuring and
-building the kernel, then index it:
-
-#+begin_src sh
-./scripts/clang-tools/gen_compile_commands.py
-rc -J .
-#+end_src
-
-* Optional LanguageTool integration
-
-Emacs is configured to contact LanguageTool on =localhost:8010=. If you use
-this integration, install Docker through Omarchy and verify its service is
-running before installing the container unit:
-
-#+begin_src sh
-omarchy install docker
-sudo install -m 0644 ~/dev/distroconf/langtool.service /etc/systemd/system/langtool.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now langtool.service
-#+end_src
-
-The service pulls the LanguageTool image on its first start.
-
-* Optional network mounts
-
-See [[file:mounts.org][the network mounts guide]] for location-aware NFS and CIFS setup.
-
-=nfs-utils= is included in the package manifest. Configure workstation-specific
-mounts separately in =/etc/fstab= or systemd mount units, using the correct
-server, exported paths, and local mount points. These mappings are not portable
-between workstations and are not managed by bootstrap.
+- [[file:kas.org][kas with rootless Podman]]: Yocto builds and writable repositories.
+- [[file:vm.org][VM testing]]: test configuration changes on a dedicated Omarchy guest.

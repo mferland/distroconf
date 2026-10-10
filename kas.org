@@ -1,0 +1,73 @@
+#+title: Yocto builds with kas and rootless Podman
+
+[[file:README.md][Back to the manual index]]
+
+* Yocto builds with kas and rootless Podman
+
+=podman= is included in the official package manifest and installed by
+=bootstrap.sh=. To install it on an existing workstation:
+
+#+begin_src sh
+omarchy pkg add podman
+#+end_src
+
+Kas recommends Podman for rootless operation. For Yocto/OpenEmbedded builds,
+=kas-container= uses =--userns=keep-id= to preserve your user identity on
+mounted files, allowing a writable source repository. Run it as your normal
+user, without =sudo=; no Docker daemon or Podman API socket is needed.
+
+** Select Podman instead of Docker
+
+If both engines are installed, kas normally prefers Docker. Select Podman
+in the current terminal:
+
+#+begin_src sh
+export KAS_CONTAINER_ENGINE=podman
+#+end_src
+
+To retain this preference in future Bash terminals, add that export line
+once to =~/.bashrc=, then open a new terminal or source the file. The managed
+=~/.bash_profile= also sources =~/.bashrc=. Docker can remain installed for
+other applications; Docker contexts and =DOCKER_HOST= do not select the kas
+engine when =KAS_CONTAINER_ENGINE=podman= is set.
+
+** Verify rootless setup and run kas
+
+Podman requires subordinate UID/GID ranges for your user in =/etc/subuid=
+and =/etc/subgid=, plus =newuidmap= and =newgidmap=. This workstation already
+has those prerequisites. Check them on a new installation before building:
+
+#+begin_src sh
+command -v newuidmap newgidmap
+awk -F: -v user="$USER" '$1 == user' /etc/subuid /etc/subgid
+podman info --format '{{.Host.Security.Rootless}}'  # Expected: true
+#+end_src
+
+From the directory containing your project's kas configuration:
+
+#+begin_src sh
+BB_NUMBER_THREADS=1 kas-container shell kas-kde-release-test.yml
+kas-container --repo-rw build kas-kde-release-test.yml
+#+end_src
+
+=shell= mounts the repository writable by default. =build= defaults to
+read-only, so specify =--repo-rw= when build-time access must also be writable.
+There is no requirement to pass =--repo-ro= with Podman for these Yocto builds.
+
+If migrating from rootless Docker, existing workspace files may have
+incompatible ownership. Preserve the old workspace and select a fresh one:
+
+#+begin_src sh
+export KAS_WORK_DIR="$HOME/kas-work/kde-podman"
+mkdir -p "$KAS_WORK_DIR"
+kas-container shell kas-kde-release-test.yml
+#+end_src
+
+Use a new directory for this example if that path already contains files
+from Docker. An external workspace is optional with Podman; =KAS_WORK_DIR=
+otherwise defaults to the current directory. Podman has separate image and
+container storage, so the first invocation downloads the kas image again.
+
+References: [[https://kas.readthedocs.io/en/latest/userguide/kas-container.html][kas container guide]],
+[[https://github.com/siemens/kas/blob/5.4/kas-container][kas 5.4 user namespace and mount handling]], and
+[[https://docs.podman.io/en/latest/markdown/podman.1.html][Podman rootless prerequisites]].

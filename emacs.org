@@ -1,0 +1,40 @@
+#+title: Optional Emacs integrations
+
+[[file:README.md][Back to the manual index]]
+
+* Optional RTags integration
+
+The Emacs configuration includes RTags support. If you use it, install the
+RTags tools separately and verify that =/usr/local/bin/rdm= exists before
+installing these units:
+
+#+begin_src sh
+mkdir -p ~/.config/systemd/user
+install -m 0644 ~/dev/distroconf/rdm.service ~/.config/systemd/user/rdm.service
+install -m 0644 ~/dev/distroconf/rdm.socket ~/.config/systemd/user/rdm.socket
+systemctl --user daemon-reload
+systemctl --user enable --now rdm.socket
+#+end_src
+
+For kernel sources, generate a compilation database after configuring and
+building the kernel, then index it:
+
+#+begin_src sh
+./scripts/clang-tools/gen_compile_commands.py
+rc -J .
+#+end_src
+
+* Optional LanguageTool integration
+
+Emacs is configured to contact LanguageTool on =localhost:8010=. If you use
+this integration, install Docker through Omarchy and verify its service is
+running before installing the container unit:
+
+#+begin_src sh
+omarchy install docker
+sudo install -m 0644 ~/dev/distroconf/langtool.service /etc/systemd/system/langtool.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now langtool.service
+#+end_src
+
+The service pulls the LanguageTool image on its first start.

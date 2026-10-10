@@ -1,5 +1,7 @@
 #+title: Network mounts
 
+[[file:README.md][Back to the manual index]]
+
 This file contains the machine-level configuration for network filesystems.
 The SAP CIFS share is reachable only on the work network, while the NAS NFS
 exports are reachable only on the home network.

@@ -1,0 +1,16 @@
+#+title: Workstation hardware setup
+
+[[file:README.md][Back to the manual index]]
+
+* Keyboard mapping
+
+=70-keyboard.hwdb= maps a key on the matching USB keyboard to Left Meta.
+Install it only on a workstation using that keyboard:
+
+#+begin_src sh
+sudo install -m 0644 ~/dev/distroconf/70-keyboard.hwdb /etc/udev/hwdb.d/70-keyboard.hwdb
+sudo systemd-hwdb update
+#+end_src
+
+The general US/Canadian layout and Shift-key layout switching are
+already managed by =input.lua=.

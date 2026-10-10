@@ -1,5 +1,7 @@
 #+title: YubiKey 5 NFC setup on Arch Linux and Omarchy
 
+[[file:README.md][Back to the manual index]]
+
 * Before enrolling the key
 
 - Keep recovery codes and an independent way to sign in to every account.
